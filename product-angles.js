@@ -221,6 +221,12 @@ window.fu7ureProductAngles = {
       "label": "Rear"
     }
   ],
+  "warcore-fingerless-work-gloves": [
+    {
+      "src": "media/angles/warcore-fingerless-work-gloves-1.webp",
+      "label": "Worn profile"
+    }
+  ],
   "warcore-lace-up-boots": [
     {
       "src": "media/angles/warcore-lace-up-boots-1.webp",

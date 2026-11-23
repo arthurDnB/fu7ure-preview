@@ -32,7 +32,19 @@
     <a class="product-back" id="product-back" href="./#merchandise"><span aria-hidden="true">←</span> <span id="product-back-label">Shop</span></a>
     <p id="product-message" role="status">Loading product…</p>
     <noscript><p>Enable JavaScript to view product details and use the bag.</p></noscript>
-    <article class="product-sheet" id="product-sheet" hidden></article>
+    <article class="product-sheet" id="product-sheet" hidden>
+      <section class="product-photos" aria-labelledby="product-photos-heading">
+        <h2 id="product-photos-heading">Product photos</h2>
+        <div class="product-photo-list" id="product-photo-list"></div>
+      </section>
+    </article>
   </main>
+  <template id="product-guide-template">
+    <button type="button" class="size-guide-toggle" aria-expanded="false" aria-controls="product-size-guide">Size guide</button>
+    <section class="product-size-guide" id="product-size-guide" aria-label="Size guide" hidden>
+      <p class="product-size-options" id="product-size-options"></p>
+      <p id="product-size-advice"></p>
+    </section>
+  </template>
 </body>
 </html>

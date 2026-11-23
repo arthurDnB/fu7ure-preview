@@ -16,7 +16,7 @@
       title.id = "preview-name";
       details.querySelector("#preview-name").replaceWith(title);
       details.querySelector(".editorial-link").href = "./#coming-soon";
-      byId("product-sheet").append(details);
+      byId("product-sheet").prepend(details);
       for (const id of ["shopping-bag", "demo-checkout", "bag-item-template"]) {
         document.body.append(catalog.querySelector("#" + id));
       }
@@ -93,11 +93,12 @@
     const name = card.querySelector("h4, h5").textContent;
     const type = card.querySelector(".product-caption > span")?.textContent || "Accessories";
     const style = collection.querySelector(".collection-name").textContent;
+    const credit = collection.querySelector(".collection-credit");
     const price = card.querySelector(".product-price");
     const src = image.getAttribute("src");
     const key = src.split("/").pop().replace(/\.webp$/, "");
     return {
-      index, card, template: card.cloneNode(true), name, type, style, key, price,
+      index, card, template: card.cloneNode(true), name, type, style, credit, key, price,
       sizes: sizesByProduct[key] || sizesByType[type] || ["One size"],
       audience: collection.dataset.look,
       collection: collection.id,
@@ -142,6 +143,7 @@
       controls.append(galleryButton(-1, product), readout, galleryButton(1, product));
       gallery.append(controls);
     }
+    return gallery;
   }
 
   function enhanceCard(card, product, showStyle) {
@@ -196,6 +198,10 @@
     image.alt = index === 0 ? product.alt : product.name + " — " + frame.label;
     const readout = gallery.querySelector(".angle-readout");
     if (readout) readout.textContent = (index + 1) + " / " + product.frames.length;
+    const thumbnails = gallery.parentElement.querySelector(".photo-thumbnails");
+    if (thumbnails) {
+      [...thumbnails.children].forEach((button, i) => button.setAttribute("aria-pressed", String(i === index)));
+    }
   }
 
   function renderCatalog() {
@@ -250,7 +256,7 @@
     image.src = product.frames[0].src;
     image.alt = product.alt;
     holder.replaceChildren(image);
-    addGallery(image, product);
+    const gallery = addGallery(image, product);
     byId("preview-name").textContent = product.name;
     const previewPrice = byId("preview-price");
     previewPrice.value = product.price.value;
@@ -259,12 +265,89 @@
     const text = byId("preview-description");
     text.textContent = descriptions[product.key] || "";
     text.hidden = !text.textContent;
+    return gallery;
   }
 
   function openPreview(product) {
     showProduct(product);
     dialog.showModal();
     sizeSelect.focus();
+  }
+
+  function renderProductPhotos(product, gallery) {
+    const thumbnails = document.createElement("div");
+    thumbnails.className = "photo-thumbnails";
+    thumbnails.setAttribute("role", "group");
+    thumbnails.setAttribute("aria-label", "Product photo angles");
+
+    const photos = product.frames.map((frame, index) => {
+      const image = document.createElement("img");
+      image.src = frame.src;
+      image.width = image.height = 512;
+      image.loading = "lazy";
+      image.alt = index === 0 ? product.alt : product.name + " — " + frame.label;
+
+      if (product.frames.length > 1) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.setAttribute("aria-label", "Show " + frame.label.toLowerCase());
+        button.setAttribute("aria-pressed", String(index === 0));
+
+        const thumbnail = image.cloneNode();
+        thumbnail.alt = "";
+        thumbnail.width = thumbnail.height = 64;
+        const label = document.createElement("span");
+        label.textContent = frame.label;
+        button.append(thumbnail, label);
+        button.addEventListener("click", () => showAngle(gallery, product, index));
+        thumbnails.append(button);
+      }
+
+      const figure = document.createElement("figure");
+      const link = document.createElement("a");
+      link.href = frame.src;
+      link.target = "_blank";
+      link.rel = "noopener";
+      link.setAttribute("aria-label", "Open full-size photo: " + frame.label + " (new tab)");
+      link.append(image);
+      const caption = document.createElement("figcaption");
+      caption.textContent = frame.label;
+      figure.append(link, caption);
+      return figure;
+    });
+
+    if (thumbnails.childElementCount) gallery.after(thumbnails);
+    byId("product-photo-list").replaceChildren(...photos);
+  }
+
+  function renderSizeGuide(product) {
+    const template = byId("product-guide-template").content.cloneNode(true);
+    const toggle = template.querySelector("button");
+    const guide = template.querySelector("section");
+    const sizeHeading = document.createElement("div");
+    sizeHeading.className = "product-size-heading";
+    const label = purchaseForm.querySelector("label");
+    label.before(sizeHeading);
+    sizeHeading.append(label, toggle);
+    purchaseForm.after(guide);
+
+    byId("product-size-options").textContent = product.sizes.join(" · ");
+    const fitNotes = {
+      Tops: "Measure around the fullest part of your chest.",
+      Outerwear: "Measure around your chest over the layer you plan to wear underneath.",
+      Bottoms: "Measure around your waist where you want the waistband to sit.",
+      Footwear: "Check the EU size marked inside a pair of shoes that fits you well.",
+      Gloves: "Measure around your palm across the knuckles, leaving out the thumb.",
+    };
+    const fit = product.sizes.length === 1
+      ? "This piece has one preview size."
+      : fitNotes[product.type] || "";
+    byId("product-size-advice").textContent = [fit, "Final fit measurements will be available before launch."].filter(Boolean).join(" ");
+
+    toggle.addEventListener("click", () => {
+      guide.hidden = !guide.hidden;
+      toggle.setAttribute("aria-expanded", String(!guide.hidden));
+    });
   }
 
   function renderProductPage() {
@@ -280,7 +363,12 @@
     document.title = product.name + " · FU7URE";
     byId("product-back").href = "./#" + product.collection;
     byId("product-back-label").textContent = product.style;
-    showProduct(product);
+    const gallery = showProduct(product);
+    const styleName = document.createElement("span");
+    styleName.textContent = product.style;
+    byId("preview-type").replaceChildren(styleName, product.credit.cloneNode(true));
+    renderProductPhotos(product, gallery);
+    if (supportsBag) renderSizeGuide(product);
     byId("product-sheet").hidden = false;
     message.hidden = true;
   }
@@ -515,7 +603,7 @@
   document.addEventListener("pointermove", (event) => {
     if (event.pointerType === "touch" || event.target.closest(".angle-bar")) return;
     const gallery = event.target.closest(".product-gallery");
-    if (!gallery) return;
+    if (!gallery || (productPage && gallery.nextElementSibling?.matches(".photo-thumbnails"))) return;
     const product = products[Number(gallery.dataset.product)];
     const box = gallery.getBoundingClientRect();
     const fraction = Math.min(0.999, Math.max(0, (event.clientX - box.left) / box.width));

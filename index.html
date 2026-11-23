@@ -4,19 +4,27 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#101211">
-  <meta name="description" content="Six clothing styles in motion. Explore the FU7URE lookbook and merchandise by style.">
-  <title>FU7URE — Lookbook &amp; Merchandise</title>
+  <meta name="description" content="FU7URE ravewear and accessories. Explore the Show, discover the lore, and preview six collections.">
+  <title>FU7URE — Ravewear &amp; Accessories</title>
   <link rel="preload" href="media/r2-sasha-front.webp" as="image">
   <link rel="stylesheet" href="styles.css">
   <script defer src="media-config.js"></script>
   <script defer src="site.js"></script>
+  <script defer src="product-angles.js"></script>
+  <script defer src="shop.js"></script>
 </head>
 <body>
   <a class="skip-link" href="#lookbook">Skip to the lookbook</a>
   <header class="masthead">
     <div class="masthead-inner">
       <a class="logo" href="#lookbook" aria-label="FU7URE — Back to the lookbook">FU<span>7</span>URE</a>
-      <a class="shop-link" href="#merchandise">Shop by style <span aria-hidden="true">↘</span></a>
+      <nav class="store-nav" aria-label="Main navigation">
+        <a href="#merchandise">Shop</a>
+        <a href="#show">Show</a>
+        <a href="#lore">Lore</a>
+        <a href="#about">About</a>
+        <a href="#coming-soon">Coming soon</a>
+      </nav>
       <button class="motion-button" type="button" id="motion" hidden aria-pressed="false">
         <span class="motion-indicator" aria-hidden="true"></span>
         Motion
@@ -25,6 +33,7 @@
   </header>
 
   <main id="lookbook" tabindex="-1">
+    <div id="show" class="show-anchor" tabindex="-1"></div>
     <div class="journey" id="journey" hidden>
       <div class="stage" id="stage">
         <figure class="artwork">
@@ -39,18 +48,20 @@
         </figure>
 
         <div class="stage-heading">
-          <h1 class="sr-only">FU7URE Lookbook</h1>
+          <h1 class="show-title">Ravewear<span>.</span></h1>
           <span class="stage-index" id="look-index">01 / 03</span>
         </div>
         <div class="callouts" id="callouts" aria-label="Styles in this scene">
-          <div class="callout" data-side="left">
+          <div class="callout">
+            <span class="callout-line" aria-hidden="true"></span><span class="callout-pin" aria-hidden="true"></span>
             <a class="style-link" href="#style-cybercore">
-              <span class="style-name">Cybercore</span><span class="style-arrow" aria-hidden="true">↘</span>
+              <span class="style-tag"><span class="style-name">Cybercore</span><span class="style-credit">by <img class="style-mark" src="media/marks/r2.png" alt="R2"></span></span><span class="style-arrow" aria-hidden="true">↘</span>
             </a>
           </div>
-          <div class="callout" data-side="right">
+          <div class="callout">
+            <span class="callout-line" aria-hidden="true"></span><span class="callout-pin" aria-hidden="true"></span>
             <a class="style-link" href="#style-warcore">
-              <span class="style-name">Warcore</span><span class="style-arrow" aria-hidden="true">↘</span>
+              <span class="style-tag"><span class="style-name">Warcore</span><span class="style-credit">by <img class="style-mark" src="media/marks/molot.png" alt="MOLOT"></span></span><span class="style-arrow" aria-hidden="true">↘</span>
             </a>
           </div>
         </div>
@@ -80,7 +91,7 @@
     </div>
 
     <section class="still-sequence" id="still-sequence" aria-labelledby="still-title">
-      <h1 id="still-title">FU7URE Lookbook</h1>
+      <h1 id="still-title">The Show<span>.</span></h1>
       <nav class="still-nav" aria-label="Jump to a look">
         <a href="#r2-sasha">Cybercore &amp; Warcore</a>
         <a href="#tsubasa-qu4nt">Kurowear &amp; Techwear</a>
@@ -120,11 +131,38 @@
         </div>
       </article>
     </section>
-    <section class="merchandise" id="merchandise" aria-labelledby="merchandise-title" tabindex="-1">
+    <section class="merchandise" id="merchandise" data-after-film aria-labelledby="merchandise-title" tabindex="-1">
       <div class="merch-inner">
         <header class="merch-header">
-          <h2 id="merchandise-title">Merchandise<span>.</span></h2>
+          <h2 id="merchandise-title">Shop<span>.</span></h2>
+          <p>Rave apparel and accessories across six FU7URE styles.</p>
         </header>
+        <div class="shop-browse" id="shop-browse" hidden>
+          <div class="browse-row">
+            <fieldset class="look-filters">
+              <legend class="sr-only">Browse styled looks</legend>
+              <label><input type="radio" name="shop-look" value="all" checked><span>All looks</span></label>
+              <label><input type="radio" name="shop-look" value="men"><span>Men’s looks</span></label>
+              <label><input type="radio" name="shop-look" value="women"><span>Women’s looks</span></label>
+            </fieldset>
+            <label class="shop-search"><span>Search the catalog</span><input id="shop-search" type="search" placeholder="Try cargos or boots" autocomplete="off"></label>
+          </div>
+          <div class="category-filters" aria-label="Shop by category">
+            <button type="button" data-category="style" aria-pressed="true">By style</button>
+            <button type="button" data-category="all" aria-pressed="false">All items</button>
+            <button type="button" data-category="Tops" aria-pressed="false">Tops</button>
+            <button type="button" data-category="Bottoms" aria-pressed="false">Bottoms</button>
+            <button type="button" data-category="Outerwear" aria-pressed="false">Outerwear</button>
+            <button type="button" data-category="Footwear" aria-pressed="false">Footwear</button>
+            <button type="button" data-category="Accessories" aria-pressed="false">Accessories</button>
+          </div>
+          <section id="catalog-results" class="catalog-results" hidden aria-label="Matching products">
+            <p id="catalog-summary" class="catalog-summary" role="status"></p>
+            <ul class="products catalog-products" id="filtered-products"></ul>
+            <p id="catalog-empty" class="catalog-empty" hidden>No matching pieces. <button id="clear-filters" type="button">Reset filters</button></p>
+          </section>
+        </div>
+        <div id="style-catalog">
         <nav class="collection-nav" aria-label="Merchandise by style">
           <a href="#style-cybercore">Cybercore</a>
           <a href="#style-warcore">Warcore</a>
@@ -133,7 +171,7 @@
           <a href="#style-goth">Goth</a>
           <a href="#style-track-techwear">Track Techwear</a>
         </nav>
-        <section class="collection" id="style-cybercore" data-tone="amber" aria-labelledby="collection-cybercore" tabindex="-1">
+        <section class="collection" id="style-cybercore" data-look="men" data-tone="amber" aria-labelledby="collection-cybercore" tabindex="-1">
           <header class="collection-header">
             <h3 id="collection-cybercore">Cybercore</h3>
             <p>Modular hardware and oversized silhouettes.</p>
@@ -181,7 +219,7 @@
             </ul>
           </details>
         </section>
-        <section class="collection" id="style-warcore" data-tone="olive" aria-labelledby="collection-warcore" tabindex="-1">
+        <section class="collection" id="style-warcore" data-look="women" data-tone="olive" aria-labelledby="collection-warcore" tabindex="-1">
           <header class="collection-header">
             <h3 id="collection-warcore">Warcore</h3>
             <p>Utility layers in olive and black.</p>
@@ -229,7 +267,7 @@
             </ul>
           </details>
         </section>
-        <section class="collection" id="style-kurowear" data-tone="yellow" aria-labelledby="collection-kurowear" tabindex="-1">
+        <section class="collection" id="style-kurowear" data-look="women" data-tone="yellow" aria-labelledby="collection-kurowear" tabindex="-1">
           <header class="collection-header">
             <h3 id="collection-kurowear">Kurowear</h3>
             <p>Black technical layers with sharp yellow accents.</p>
@@ -277,7 +315,7 @@
             </ul>
           </details>
         </section>
-        <section class="collection" id="style-techwear" data-tone="blue" aria-labelledby="collection-techwear" tabindex="-1">
+        <section class="collection" id="style-techwear" data-look="men" data-tone="blue" aria-labelledby="collection-techwear" tabindex="-1">
           <header class="collection-header">
             <h3 id="collection-techwear">Techwear</h3>
             <p>Streamlined cuts, reflective seams and a monochrome palette.</p>
@@ -325,7 +363,7 @@
             </ul>
           </details>
         </section>
-        <section class="collection" id="style-goth" data-tone="violet" aria-labelledby="collection-goth" tabindex="-1">
+        <section class="collection" id="style-goth" data-look="women" data-tone="violet" aria-labelledby="collection-goth" tabindex="-1">
           <header class="collection-header">
             <h3 id="collection-goth">Goth</h3>
             <p>Long black layers, corset lacing and heavy soles.</p>
@@ -373,7 +411,7 @@
             </ul>
           </details>
         </section>
-        <section class="collection" id="style-track-techwear" data-tone="orange" aria-labelledby="collection-track-techwear" tabindex="-1">
+        <section class="collection" id="style-track-techwear" data-look="men" data-tone="orange" aria-labelledby="collection-track-techwear" tabindex="-1">
           <header class="collection-header">
             <h3 id="collection-track-techwear">Track Techwear</h3>
             <p>Numbered jerseys, race stripes and performance silhouettes.</p>
@@ -419,13 +457,77 @@
             </section>
           </details>
         </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="editorial-section" id="about" data-after-film aria-labelledby="about-title" tabindex="-1">
+      <div class="editorial-inner about-layout">
+        <h2 id="about-title">About FU7URE<span>.</span></h2>
+        <div>
+          <p class="editorial-lead">Clothing for ravers.</p>
+          <p>FU7URE brings clubwear, techwear and alternative fashion into the same wardrobe. Each character in the Show wears a different style, from utility layers and oversized cargos to gothic coats and race-stripe jerseys.</p>
+          <a class="editorial-link" href="#show">Explore the Show <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="editorial-section lore-section" id="lore" data-after-film aria-labelledby="lore-title" tabindex="-1">
+      <div class="editorial-inner lore-layout">
+        <div>
+          <h2 id="lore-title">Lore<span>.</span></h2>
+          <p class="editorial-lead">Six looks from a city after dark.</p>
+          <p>R2 is a pilot and a DJ whose face has never been seen. In the Show, the camera follows him and the rest of the cast through one night, as each pair brings a different FU7URE style onto the dance floor.</p>
+          <p class="release-note">More lore coming soon.</p>
+        </div>
+        <img src="media/fu7ure-city.webp" alt="Concept art of FU7URE’s futuristic city skyline" loading="lazy">
+      </div>
+    </section>
+
+    <section class="editorial-section launch-section" id="coming-soon" data-after-film aria-labelledby="coming-soon-title" tabindex="-1">
+      <div class="editorial-inner about-layout">
+        <h2 id="coming-soon-title">Coming soon<span>.</span></h2>
+        <div>
+          <p class="editorial-lead">The first FU7URE drop.</p>
+          <p>Apparel and accessories from the lookbook. The release date and final lineup will be announced before orders open.</p>
+          <a class="editorial-link" href="#merchandise">Browse the preview <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="editorial-section support-section" id="support" data-after-film aria-labelledby="support-title" tabindex="-1">
+      <div class="editorial-inner">
+        <h2 id="support-title">Customer care<span>.</span></h2>
+        <div class="support-grid">
+          <article id="size-and-fit" tabindex="-1"><h3>Size &amp; fit</h3><p>Garment measurements and fit notes will be available for each piece in the first drop.</p></article>
+          <article id="shipping-and-returns" tabindex="-1"><h3>Shipping &amp; returns</h3><p>Delivery regions, rates and return instructions will be available before orders open.</p></article>
+          <article id="contact" tabindex="-1"><h3>Contact</h3><p>Order support details will be available when the shop opens.</p></article>
+        </div>
       </div>
     </section>
   </main>
 
-  <footer class="footer">
-    <span>FU7URE</span>
-    <a href="#lookbook">Back to the lookbook <span aria-hidden="true">↑</span></a>
+  <footer class="footer store-footer" data-after-film>
+    <a class="logo" href="#lookbook" aria-label="FU7URE home">FU<span>7</span>URE</a>
+    <nav aria-label="Customer care">
+      <a href="#size-and-fit">Size &amp; fit</a>
+      <a href="#shipping-and-returns">Shipping &amp; returns</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <a href="#lookbook">Back to top <span aria-hidden="true">↑</span></a>
   </footer>
+
+  <dialog class="product-dialog" id="product-preview" aria-labelledby="preview-name">
+    <form method="dialog" class="preview-close"><button type="submit" aria-label="Close product preview">×</button></form>
+    <div class="preview-content">
+      <div class="preview-media" id="preview-media"></div>
+      <div>
+        <p class="preview-type" id="preview-type"></p>
+        <h2 id="preview-name"></h2>
+        <p id="preview-description"></p>
+        <a class="editorial-link" href="#coming-soon">First drop information <span aria-hidden="true">↗</span></a>
+      </div>
+    </div>
+  </dialog>
 </body>
 </html>

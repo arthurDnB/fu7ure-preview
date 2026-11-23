@@ -25,10 +25,15 @@
         <a href="#about">About</a>
         <a href="#coming-soon">Coming soon</a>
       </nav>
-      <button class="motion-button" type="button" id="motion" hidden aria-pressed="false">
-        <span class="motion-indicator" aria-hidden="true"></span>
-        Motion
-      </button>
+      <div class="header-actions">
+        <button class="motion-button" type="button" id="motion" hidden aria-pressed="false">
+          <span class="motion-indicator" aria-hidden="true"></span>
+          Motion
+        </button>
+        <button class="bag-toggle" type="button" id="bag-toggle" aria-haspopup="dialog" hidden>
+          Bag <span id="bag-count">0</span>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -586,9 +591,55 @@
         <h2 id="preview-name"></h2>
         <p class="preview-price"><data class="product-price" id="preview-price"></data><span>Sample price</span></p>
         <p id="preview-description"></p>
+        <form class="product-purchase" id="product-purchase" hidden>
+          <div>
+            <label for="preview-size">Size</label>
+            <select id="preview-size" required></select>
+          </div>
+          <button class="add-to-bag" type="submit">Add to Bag</button>
+        </form>
         <a class="editorial-link" href="#coming-soon">First drop information <span aria-hidden="true">↗</span></a>
       </div>
     </div>
   </dialog>
+
+  <dialog class="bag-dialog" id="shopping-bag" aria-labelledby="bag-title">
+    <div class="bag-header">
+      <h2 id="bag-title">Your bag</h2>
+      <form method="dialog" class="bag-close">
+        <button type="submit" aria-label="Close shopping bag" autofocus>×</button>
+      </form>
+    </div>
+    <div class="bag-content">
+      <p class="bag-empty" id="bag-empty">Your bag is empty.</p>
+      <ul class="bag-items" id="bag-items" aria-label="Bag items"></ul>
+    </div>
+    <div class="bag-footer">
+      <p class="bag-total"><span>Total</span> <output id="bag-total" aria-label="Bag total" aria-live="polite">A$0</output></p>
+      <p class="bag-note">Sample prices in AUD. Orders open at launch.</p>
+      <form method="dialog">
+        <button class="bag-continue" type="submit">Continue shopping</button>
+      </form>
+    </div>
+  </dialog>
+
+  <template id="bag-item-template">
+    <li class="bag-item">
+      <img class="bag-item-image" alt="" width="64" height="64">
+      <div class="bag-item-info">
+        <p class="bag-item-name"></p>
+        <p class="bag-item-size"></p>
+        <div class="bag-item-actions">
+          <div class="bag-quantity" role="group">
+            <button type="button" data-bag-action="decrease">−</button>
+            <span class="bag-item-count"></span>
+            <button type="button" data-bag-action="increase">+</button>
+          </div>
+          <button type="button" class="bag-remove" data-bag-action="remove">Remove</button>
+        </div>
+      </div>
+      <p class="bag-line-total"></p>
+    </li>
+  </template>
 </body>
 </html>

@@ -10,6 +10,15 @@
   const noResults = byId("catalog-empty");
   const search = byId("shop-search");
   const dialog = byId("product-preview");
+  const purchaseForm = byId("product-purchase");
+  const sizeSelect = byId("preview-size");
+  const bagDialog = byId("shopping-bag");
+  const bagToggle = byId("bag-toggle");
+  const bagItems = byId("bag-items");
+  const bagTemplate = byId("bag-item-template");
+  const bagKey = "fu7ure-preview:bag";
+  const supportsBag = typeof bagDialog.showModal === "function";
+  const numberFormat = new Intl.NumberFormat("en-AU");
   const categoryButtons = [...browse.querySelectorAll("[data-category]")];
   const audienceInputs = [...browse.querySelectorAll("[name=shop-look]")];
   const mainLinks = [...document.querySelectorAll(".store-nav a")];
@@ -35,6 +44,20 @@
     "track-techwear-comms-earpiece": "An orange-accented earpiece with a short boom mic.",
   };
 
+  const clothingSizes = ["XS", "S", "M", "L", "XL", "XXL"];
+  const gearSizes = ["S", "M", "L", "XL"];
+  const shoeSizes = Array.from({ length: 11 }, (_, i) => "EU " + (36 + i));
+  const sizesByType = {
+    Tops: clothingSizes, Bottoms: clothingSizes, Outerwear: clothingSizes,
+    Footwear: shoeSizes, Gloves: gearSizes,
+  };
+  const sizesByProduct = {
+    "cybercore-chest-harness": gearSizes,
+    "cybercore-amber-helmet": gearSizes,
+    "kurowear-rex-g7": gearSizes,
+    "goth-half-face-respirator": ["S", "M", "L"],
+  };
+
   const products = [...styles.querySelectorAll(".product")].map((card, index) => {
     const collection = card.closest(".collection");
     const image = card.querySelector("img");
@@ -46,6 +69,7 @@
     const key = src.split("/").pop().replace(/\.webp$/, "");
     return {
       index, card, template: card.cloneNode(true), name, type, style, key, price,
+      sizes: sizesByProduct[key] || sizesByType[type] || ["One size"],
       audience: collection.dataset.look,
       category: ownCategories.has(type) ? type : "Accessories",
       frames: [{ src, label: "Main view" }, ...(angleSources[key] || [])],
@@ -53,6 +77,11 @@
     };
   });
 
+  const productsByKey = new Map(products.map((product) => [product.key, product]));
+  const bagLineKey = (key, size) => key + ":" + size;
+  const money = (amount) => "A$" + numberFormat.format(amount);
+  let bag = loadBag();
+  let previewProduct;
   let category = "style";
   const warmed = new Set();
 
@@ -99,7 +128,20 @@
       button.dataset.preview = String(product.index);
       button.textContent = "View details";
       button.setAttribute("aria-label", "View details for " + product.name);
-      caption.append(button);
+      const actions = document.createElement("div");
+      actions.className = "product-actions";
+      actions.append(button);
+      if (supportsBag) {
+        const add = document.createElement("button");
+        add.type = "button";
+        add.className = "product-add";
+        add.dataset.preview = String(product.index);
+        add.dataset.chooseSize = "";
+        add.textContent = "Add to Bag";
+        add.setAttribute("aria-label", "Add " + product.name + " to bag");
+        actions.append(add);
+      }
+      caption.append(actions);
     }
     return card;
   }
@@ -164,7 +206,13 @@
     renderCatalog();
   }
 
-  function openPreview(product) {
+  function openPreview(product, chooseSize) {
+    previewProduct = product;
+    if (supportsBag) {
+      const sizes = product.sizes.map((size) => new Option(size, size));
+      if (sizes.length > 1) sizes.unshift(new Option("Select size", "", true, true));
+      sizeSelect.replaceChildren(...sizes);
+    }
     const holder = byId("preview-media");
     const image = document.createElement("img");
     image.src = product.frames[0].src;
@@ -180,6 +228,117 @@
     text.textContent = descriptions[product.key] || "";
     text.hidden = !text.textContent;
     dialog.showModal();
+    if (chooseSize) sizeSelect.focus();
+  }
+
+  function loadBag() {
+    const lines = new Map();
+    try {
+      const saved = JSON.parse(localStorage.getItem(bagKey));
+      if (!Array.isArray(saved)) return lines;
+      for (const line of saved) {
+        const product = productsByKey.get(line?.key);
+        if (product?.sizes.includes(line.size) && Number.isSafeInteger(line.quantity) && line.quantity > 0) {
+          lines.set(bagLineKey(line.key, line.size), line);
+        }
+      }
+    } catch {
+      // The bag can still be used with storage disabled.
+    }
+    return lines;
+  }
+
+  function saveBag() {
+    try {
+      localStorage.setItem(bagKey, JSON.stringify([...bag.values()]));
+    } catch {
+      // Keep the current bag in memory if storage becomes unavailable.
+    }
+    renderBag();
+  }
+
+  function renderBag() {
+    let count = 0;
+    let total = 0;
+    const rows = [];
+    for (const [id, { key, size, quantity }] of bag) {
+      const product = productsByKey.get(key);
+      const subtotal = Number(product.price.value) * quantity;
+      count += quantity;
+      total += subtotal;
+
+      const row = bagTemplate.content.firstElementChild.cloneNode(true);
+      row.dataset.bagLine = id;
+      row.querySelector("img").src = product.frames[0].src;
+      row.querySelector(".bag-item-name").textContent = product.name;
+      row.querySelector(".bag-item-size").textContent = size === "One size" ? size : "Size " + size;
+      row.querySelector(".bag-item-count").textContent = quantity;
+      row.querySelector(".bag-line-total").textContent = money(subtotal);
+
+      const label = product.name + ", " + size;
+      row.querySelector(".bag-quantity").setAttribute("aria-label", "Quantity for " + label);
+      const less = row.querySelector("[data-bag-action=decrease]");
+      less.setAttribute("aria-label", "Decrease quantity of " + label);
+      less.disabled = quantity === 1;
+      row.querySelector("[data-bag-action=increase]").setAttribute("aria-label", "Increase quantity of " + label);
+      row.querySelector("[data-bag-action=remove]").setAttribute("aria-label", "Remove " + label);
+      rows.push(row);
+    }
+
+    bagItems.replaceChildren(...rows);
+    byId("bag-empty").hidden = count > 0;
+    byId("bag-count").textContent = count;
+    byId("bag-total").value = money(total);
+  }
+
+  function changeQuantity(event) {
+    const button = event.target.closest("[data-bag-action]");
+    if (!button) return;
+    const { bagLine } = button.closest("[data-bag-line]").dataset;
+    const line = bag.get(bagLine);
+    const action = button.dataset.bagAction;
+    if (action === "remove") {
+      const nextRow = button.closest("li").nextElementSibling || button.closest("li").previousElementSibling;
+      bag.delete(bagLine);
+      saveBag();
+      const nextId = nextRow?.dataset.bagLine;
+      const target = [...bagItems.children].find((row) => row.dataset.bagLine === nextId);
+      (target?.querySelector(".bag-remove") || bagDialog.querySelector(".bag-continue")).focus();
+      return;
+    }
+    const quantity = line.quantity + (action === "increase" ? 1 : -1);
+    if (quantity < 1 || !Number.isSafeInteger(quantity)) return;
+    line.quantity = quantity;
+    saveBag();
+    const nextAction = action === "decrease" && quantity === 1 ? "increase" : action;
+    const row = [...bagItems.children].find((item) => item.dataset.bagLine === bagLine);
+    row.querySelector('[data-bag-action="' + nextAction + '"]').focus({ preventScroll: true });
+  }
+
+  function initBag() {
+    renderBag();
+    purchaseForm.hidden = false;
+    bagToggle.hidden = false;
+    bagToggle.addEventListener("click", () => bagDialog.showModal());
+    purchaseForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const size = sizeSelect.value;
+      const { key, sizes } = previewProduct;
+      if (!sizes.includes(size)) return;
+      const id = bagLineKey(key, size);
+      const quantity = (bag.get(id)?.quantity || 0) + 1;
+      if (!Number.isSafeInteger(quantity)) return;
+      bag.set(id, { key, size, quantity });
+      saveBag();
+      dialog.close();
+      bagDialog.showModal();
+    });
+    bagItems.addEventListener("click", changeQuantity);
+    addEventListener("storage", (event) => {
+      if (event.key !== bagKey && event.key !== null) return;
+      bag = loadBag();
+      renderBag();
+    });
   }
 
   function styleAnchor(hash) {
@@ -202,6 +361,7 @@
   }
 
   products.forEach((item) => enhanceCard(item.card, item, false));
+  if (supportsBag) initBag();
   browse.hidden = false;
   browse.addEventListener("change", updateFilteredView);
   search.addEventListener("input", updateFilteredView);
@@ -224,7 +384,7 @@
       shopByStyle();
       search.focus();
     } else if (button.dataset.preview !== undefined) {
-      openPreview(products[Number(button.dataset.preview)]);
+      openPreview(products[Number(button.dataset.preview)], button.hasAttribute("data-choose-size"));
     } else if (button.dataset.angleStep) {
       const gallery = button.closest(".product-gallery");
       const product = products[Number(gallery.dataset.product)];

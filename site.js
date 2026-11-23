@@ -10,6 +10,7 @@
   const front = byId("frame-front");
   const rear = byId("frame-detail");
   const finish = byId("frame-finish");
+  const closingMessage = byId("closing-message");
   const pillar = byId("pillar");
   const title = byId("look-title");
   const indexLabel = byId("look-index");
@@ -231,6 +232,10 @@
     front.style.setProperty("--scale", String(frontScale));
     rear.style.opacity = String(rearAmount);
     finish.style.opacity = String(finishAmount);
+    const wordmarkOpacity = ease((finishAmount - 0.55) / 0.4);
+    closingMessage.hidden = wordmarkOpacity === 0;
+    closingMessage.style.opacity = String(wordmarkOpacity);
+    stage.toggleAttribute("data-closing", wordmarkOpacity > 0);
 
     const filmReady = seekVideos(index, progress);
     let offset = 101;

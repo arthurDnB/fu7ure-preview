@@ -40,11 +40,12 @@
     const image = card.querySelector("img");
     const name = card.querySelector("h4, h5").textContent;
     const type = card.querySelector(".product-caption > span")?.textContent || "Accessories";
-    const style = collection.querySelector("h3").textContent;
+    const style = collection.querySelector(".collection-name").textContent;
+    const price = card.querySelector(".product-price");
     const src = image.getAttribute("src");
     const key = src.split("/").pop().replace(/\.webp$/, "");
     return {
-      index, card, template: card.cloneNode(true), name, type, style, key,
+      index, card, template: card.cloneNode(true), name, type, style, key, price,
       audience: collection.dataset.look,
       category: ownCategories.has(type) ? type : "Accessories",
       frames: [{ src, label: "Main view" }, ...(angleSources[key] || [])],
@@ -171,6 +172,9 @@
     holder.replaceChildren(image);
     addGallery(image, product);
     byId("preview-name").textContent = product.name;
+    const previewPrice = byId("preview-price");
+    previewPrice.value = product.price.value;
+    previewPrice.textContent = product.price.textContent;
     byId("preview-type").textContent = product.style + " / " + product.category;
     const text = byId("preview-description");
     text.textContent = descriptions[product.key] || "";

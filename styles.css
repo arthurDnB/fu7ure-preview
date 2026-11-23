@@ -293,6 +293,8 @@ h1 {
   background: #373932; border: 1px solid #3c3e38;
 }
 .product-caption { padding: 12px 0 15px; }
+.product-price { display: block; color: var(--ink); font-weight: 720; font-variant-numeric: tabular-nums; }
+.product-caption .product-price { margin-bottom: 5px; font-size: clamp(14px, 1.45vw, 19px); }
 .product-caption h4, .product-caption h5 { margin: 0 0 5px; font-size: clamp(14px, 1.5vw, 22px); line-height: 1.2; }
 .product-caption span { color: var(--muted); font: 11px/1.3 var(--mono); text-transform: uppercase; letter-spacing: .09em; }
 @media (max-width: 560px) {
@@ -372,6 +374,7 @@ h1 {
   color: var(--muted); font-size: clamp(15px, 1.6vw, 20px);
   margin: 12px 0 0; line-height: 1.4;
 }
+.merch-header .sample-prices { margin-top: 7px; font: 12px/1.45 var(--mono); }
 
 /* Catalog browsing */
 .shop-browse { margin-bottom: clamp(18px, 3vw, 36px); }
@@ -477,6 +480,9 @@ h1 {
 .preview-content > div { padding: 48px 22px 24px; }
 .preview-content h2 { margin: 7px 0 10px; font-size: clamp(24px, 3.7vw, 45px); letter-spacing: -.05em; line-height: 1; }
 .preview-content p { line-height: 1.45; color: var(--muted); }
+.preview-price { display: flex; align-items: baseline; gap: 9px; margin: 0 0 10px; }
+.preview-price .product-price { font-size: clamp(20px, 2.6vw, 31px); }
+.preview-price span { font: 11px/1.3 var(--mono); }
 .preview-content .preview-type { font: 12px/1.4 var(--mono); color: var(--accent); text-transform: uppercase; letter-spacing: .08em; }
 
 @media (max-width: 760px) {
@@ -555,4 +561,22 @@ h1 {
   .style-tag { gap: 4px; }
   .style-credit { font-size: 10px; }
   .style-credit img { height: 11px; }
+}
+
+/* Content stays fully visible when scroll-driven animation is unavailable or off. */
+@supports (animation-timeline: view()) and (animation-range: entry 0% entry 55%) {
+  @media (prefers-reduced-motion: no-preference) {
+    [data-scroll-motion] :is(.merch-header, .collection-header, .product, .editorial-inner h2, .lore-layout img, .support-grid article) {
+      animation: scroll-reveal linear both;
+      animation-timeline: view(block var(--header) 0px);
+      animation-range: entry 0% entry 55%;
+    }
+    [data-scroll-motion] .product { --scroll-shift: 0px; }
+    [data-scroll-motion] .products > .product:nth-child(even) { animation-range-end: entry 70%; }
+
+    @keyframes scroll-reveal {
+      from { opacity: .72; translate: 0 var(--scroll-shift, 18px); }
+      to { opacity: 1; translate: 0 0; }
+    }
+  }
 }

@@ -290,6 +290,7 @@
     motionOn = !smallViewport.matches && (manualMotion ?? !reducedMotion.matches);
     motionButton.hidden = smallViewport.matches;
     motionButton.setAttribute("aria-pressed", String(motionOn));
+    document.documentElement.toggleAttribute("data-scroll-motion", motionOn);
     journey.hidden = !motionOn;
     gallery.hidden = motionOn;
 

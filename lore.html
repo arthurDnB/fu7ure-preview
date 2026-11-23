@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Explore Future, the city behind FU7URE. Meet R2 and the district crews, explore their boroughs, and read the story from Signal Found to B2B.">
+  <meta name="theme-color" content="#111310">
+  <title>Lore — FU7URE</title>
+  <link rel="canonical" href="https://arthurdnb.github.io/fu7ure-preview/lore.html">
+  <meta property="og:title" content="The world of FU7URE">
+  <meta property="og:description" content="Explore the last city, meet its crews and follow the pirate signal.">
+  <meta property="og:image" content="https://arthurdnb.github.io/fu7ure-preview/media/lore/hero-city.webp">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="lore.css">
+  <script defer src="lore.js"></script>
+</head>
+<body class="lore-page">
+  <a class="skip-link" href="#lore-main">Skip to the lore</a>
+  <header class="lore-header">
+    <div class="lore-shell lore-topbar">
+      <a class="logo" href="index.html" aria-label="FU7URE home"><img src="media/marks/fu7ure-wordmark-r1.svg" alt="" width="852" height="148"></a>
+      <nav aria-label="Main navigation">
+        <a href="index.html#show">Show</a>
+        <a href="lore.html" aria-current="page">Lore</a>
+        <a href="index.html#about">About</a>
+      </nav>
+      <a class="lore-shop" href="index.html#merchandise">Shop <span aria-hidden="true">↗</span></a>
+    </div>
+    <div class="reading-track" aria-hidden="true"><span></span></div>
+  </header>
+  <main id="lore-main">
+    <section class="lore-hero" aria-labelledby="lore-title">
+      <img class="hero-world" src="media/lore/hero-city.webp" alt="" width="1664" height="936" fetchpriority="high">
+      <div class="lore-shell hero-content">
+        <p class="lore-meta">The world of FU7URE</p>
+        <h1 id="lore-title">The last<br>city<span>.</span></h1>
+        <p>Future is a city stacked in five districts. Each has its own sound and way of dressing. Above them all, a pirate signal is reaching our time.</p>
+        <a class="lore-button" href="#city">Explore the city <span aria-hidden="true">↓</span></a>
+      </div>
+    </section>
+    <nav class="lore-subnav" aria-label="Explore the lore">
+      <div class="lore-shell">
+        <a href="#city">The city</a>
+        <a href="#cast">Cast &amp; labels</a>
+        <a href="#story">The story</a>
+      </div>
+    </nav>
+
+    <section id="city" class="lore-section lore-shell" aria-labelledby="city-title">
+      <header class="lore-section-head">
+        <h2 id="city-title">Explore the city<span>.</span></h2>
+        <p>From the launch deck above the clouds to the machine cathedral below the foundry. Select a level on the map to go inside.</p>
+      </header>
+      <div class="city-explorer" data-explorer>
+        <figure class="city-map" id="city-map">
+          <img src="media/lore/city-map.webp" alt="Cross-section of Future from top to bottom: The Deck, The Grid, The Circuit, The Yard, Factory 04 and The Archive" width="940" height="1254" loading="lazy" decoding="async">
+          <div class="map-controls" data-tabs aria-label="City locations" aria-orientation="vertical" hidden>
+            <button type="button" data-target="place-deck" class="map-marker" aria-label="The Deck" data-color="yellow" style="--map-y:20%">01</button>
+            <button type="button" data-target="place-grid" class="map-marker" aria-label="The Grid" data-color="silver" style="--map-y:29%">02</button>
+            <button type="button" data-target="place-circuit" class="map-marker" aria-label="The Circuit" data-color="amber" style="--map-y:42%">03</button>
+            <button type="button" data-target="place-yard" class="map-marker" aria-label="The Yard" data-color="orange" style="--map-y:59.4%">04</button>
+            <button type="button" data-target="place-factory" class="map-marker" aria-label="Factory 04" data-color="olive" style="--map-y:72%">05</button>
+            <button type="button" data-target="place-archive" class="map-marker" aria-label="The Archive" data-color="violet" style="--map-y:83%">06</button>
+          </div>
+        </figure>
+        <div class="place-panels">
+          <article id="place-deck" class="place-panel" data-panel data-color="yellow">
+            <img src="media/lore/deck.webp" alt="Yellow-trimmed racing frames line the launch deck above the clouds" width="1080" height="608" loading="lazy" decoding="async">
+            <div class="place-copy">
+              <p class="lore-meta">H4J1ME</p>
+              <h3>The Deck</h3>
+              <p>Above the clouds, pilots launch their frames from the starting grid. H4J1ME trains here, and TSUB4S4 is the racer everyone is trying to catch.</p>
+              <a class="lore-text-link" href="#cast-tsubasa">Meet TSUB4S4 <span aria-hidden="true">↗</span></a>
+            </div>
+          </article>
+          <article id="place-grid" class="place-panel" data-panel data-color="silver">
+            <img src="media/lore/grid.webp" alt="A clock stands at the far end of a white hall of identical columns" width="1080" height="608" loading="lazy" decoding="async">
+            <div class="place-copy">
+              <p class="lore-meta">8888</p>
+              <h3>The Grid</h3>
+              <p>A white hall of repeating columns where the city keeps time. QU4NT knows every district’s rhythm well enough to notice when the clocks are being reset.</p>
+              <a class="lore-text-link" href="#cast-quant">Meet QU4NT <span aria-hidden="true">↗</span></a>
+            </div>
+          </article>
+          <article id="place-circuit" class="place-panel" data-panel data-color="amber">
+            <img src="media/lore/circuit.webp" alt="A circular arena with gates, tiered seating and a DJ platform at the centre" width="1080" height="608" loading="lazy" decoding="async">
+            <div class="place-copy">
+              <p class="lore-meta">Shared arena</p>
+              <h3>The Circuit</h3>
+              <p>Five gates open onto one floor. Built around the city’s core, The Circuit is the only arena where every district can meet and the place a Clash brings both crowds together.</p>
+              <a class="lore-text-link" href="#clash">How a Clash works <span aria-hidden="true">↗</span></a>
+            </div>
+          </article>
+          <article id="place-yard" class="place-panel" data-panel data-color="orange">
+            <img src="media/lore/yard.webp" alt="An orange-marked court under an overpass, ringed by speaker stacks" width="1080" height="608" loading="lazy" decoding="async">
+            <div class="place-copy">
+              <p class="lore-meta">ROLL3RZ</p>
+              <h3>The Yard</h3>
+              <p>At street level, an overpass shelters a court surrounded by speakers. ROLL3RZ plays drum and bass here and sends its pirate broadcast out through rooftop aerials.</p>
+              <a class="lore-text-link" href="#cast-lowkey">Meet L0WK3Y <span aria-hidden="true">↗</span></a>
+            </div>
+          </article>
+          <article id="place-factory" class="place-panel" data-panel data-color="olive">
+            <img src="media/lore/factory.webp" alt="Olive overhead machinery and steel racing frames in Factory 04" width="1080" height="608" loading="lazy" decoding="async">
+            <div class="place-copy">
+              <p class="lore-meta">МОЛОТ</p>
+              <h3>Factory 04</h3>
+              <p>Drop hammers and molten metal fill the foundry beneath The Yard. Every racing frame passes through Factory 04, where Sasha checks it before a pilot can fly it.</p>
+              <a class="lore-text-link" href="#cast-sasha">Meet Sasha <span aria-hidden="true">↗</span></a>
+            </div>
+          </article>
+          <article id="place-archive" class="place-panel" data-panel data-color="violet">
+            <img src="media/lore/archive.webp" alt="Purple light runs through gothic arches lined with speakers and old machines" width="1080" height="608" loading="lazy" decoding="async">
+            <div class="place-copy">
+              <p class="lore-meta">R4V3NS</p>
+              <h3>The Archive</h3>
+              <p>At the roots of the tower, R4V3NS keeps recordings of the old city in a cathedral built from machines. V3SP3R finds proof here that the districts once danced on the same floor.</p>
+              <a class="lore-text-link" href="#cast-vesper">Meet V3SP3R <span aria-hidden="true">↗</span></a>
+            </div>
+          </article>
+          <a class="map-return lore-text-link" href="#city-map">Back to the map <span aria-hidden="true">↑</span></a>
+        </div>
+      </div>
+
+      <section id="clash" class="clash-rules" aria-labelledby="clash-title">
+        <header>
+          <h3 id="clash-title">How a Clash works</h3>
+          <p>In Future, rival districts settle disputes through music and racing. Machines may take damage. People come off the floor safe.</p>
+        </header>
+        <ol>
+          <li><strong>Race the frames</strong><span>Three pilots from each side race through the city in giant machines called frames.</span></li>
+          <li><strong>Let the crowd decide</strong><span>Both DJs play from their own sound systems while the race runs. The crowd picks the winner.</span></li>
+          <li><strong>Go back to back</strong><span>Both DJs share a final set. The Clash ends when the two crowds dance as one.</span></li>
+        </ol>
+      </section>
+    </section>
+
+    <section id="cast" class="cast-section" aria-labelledby="cast-title">
+      <div class="lore-shell lore-section" data-explorer>
+        <header class="lore-section-head">
+          <h2 id="cast-title">Cast &amp; labels<span>.</span></h2>
+          <p>The people behind the clothes, the sounds they play, and the parts of Future they call home.</p>
+        </header>
+        <div class="cast-tabs" data-tabs aria-label="Characters" hidden>
+            <button type="button" data-target="cast-r2" data-color="amber"><img src="media/lore/cast-r2.webp" alt="" width="496" height="386" loading="lazy" decoding="async"><span>R2</span></button>
+            <button type="button" data-target="cast-sasha" data-color="olive"><img src="media/lore/cast-sasha.webp" alt="" width="496" height="386" loading="lazy" decoding="async"><span>С4Ш4</span></button>
+            <button type="button" data-target="cast-tsubasa" data-color="yellow"><img src="media/lore/cast-tsubasa.webp" alt="" width="496" height="386" loading="lazy" decoding="async"><span>TSUB4S4</span></button>
+            <button type="button" data-target="cast-quant" data-color="silver"><img src="media/lore/cast-quant.webp" alt="" width="496" height="386" loading="lazy" decoding="async"><span>QU4NT</span></button>
+            <button type="button" data-target="cast-vesper" data-color="violet"><img src="media/lore/cast-vesper.webp" alt="" width="496" height="386" loading="lazy" decoding="async"><span>V3SP3R</span></button>
+            <button type="button" data-target="cast-lowkey" data-color="orange"><img src="media/lore/cast-lowkey.webp" alt="" width="496" height="386" loading="lazy" decoding="async"><span>L0WK3Y</span></button>
+            <button type="button" data-target="cast-flat" data-color="silver"><img src="media/lore/cast-flat.webp" alt="" width="496" height="386" loading="lazy" decoding="async"><span>FL4T</span></button>
+        </div>
+        <article id="cast-r2" class="cast-panel" data-panel data-color="amber">
+          <figure class="cast-picture"><img src="media/lore/cast-r2.webp" alt="R2’s black helmet with two swept antennae and amber headphone rings" width="496" height="386" loading="lazy" decoding="async"></figure>
+          <div class="cast-copy">
+            <img class="maker-mark" src="media/marks/r2-pin-stack-r1.svg" alt="R2" width="210" height="48" loading="lazy">
+            <p class="lore-meta">Independent DJ and pilot</p>
+            <h3>R2</h3>
+            <p>Everyone in Future knows R2’s helmet. Nobody has ever seen his face. The city’s best-known DJ and a pilot in his own right, he broadcasts short, numbered transmissions over pirate radio.</p>
+            <p>R2 belongs to no faction. He is the only DJ who plays all five district sounds in one set. His Cybercore look pairs a black chest rig and oversized pilot cargos with the amber-ring helmet that doubles as his headphones.</p>
+            <dl class="cast-facts">
+              <div><dt>Sound</dt><dd>All five sounds</dd></div>
+              <div><dt>Style</dt><dd>Cybercore</dd></div>
+              <div><dt>Base</dt><dd>Independent</dd></div>
+            </dl>
+            <a class="lore-text-link" href="index.html#style-cybercore">Explore Cybercore <span aria-hidden="true">↗</span></a>
+          </div>
+        </article>
+        <article id="cast-sasha" class="cast-panel" data-panel data-color="olive">
+          <figure class="cast-picture"><img src="media/lore/cast-sasha.webp" alt="Sasha with dark wavy hair and her black and olive MOLOT collar" width="496" height="386" loading="lazy" decoding="async"></figure>
+          <div class="cast-copy">
+            <img class="maker-mark" src="media/marks/molot-coupler-r1.svg" alt="МОЛОТ" width="210" height="48" loading="lazy">
+            <p class="lore-meta">Factory 04 proof-master</p>
+            <h3>С4Ш4</h3>
+            <p class="cast-reading">Sasha · Aleksandra Kuznetsova</p>
+            <p>Sasha is nineteen, half Russian and half Korean, and the youngest proof-master Factory 04 has ever had. She tests each racing frame with a tap from her small hammer. It is her first real job, and she is starting to ask what her work is being used for.</p>
+            <p>МОЛОТ means hammer. The foundry builds the city’s racing frames to the sound of hardcore. Its Warcore clothing takes its cues from workwear, with olive panels, cargo pockets, webbing and heavy boots.</p>
+            <dl class="cast-facts">
+              <div><dt>Sound</dt><dd>Hardcore</dd></div>
+              <div><dt>Style</dt><dd>Warcore</dd></div>
+              <div><dt>Base</dt><dd><a href="#place-factory">Factory 04 <span aria-hidden="true">↗</span></a></dd></div>
+            </dl>
+            <a class="lore-text-link" href="index.html#style-warcore">Explore Warcore <span aria-hidden="true">↗</span></a>
+          </div>
+        </article>
+        <article id="cast-tsubasa" class="cast-panel" data-panel data-color="yellow">
+          <figure class="cast-picture"><img src="media/lore/cast-tsubasa.webp" alt="Tsubasa with a yellow streak in her dark bob and a pilot headset" width="496" height="386" loading="lazy" decoding="async"></figure>
+          <div class="cast-copy">
+            <img class="maker-mark" src="media/marks/h4j1me-pole-position-r1.svg" alt="H4J1ME" width="210" height="48" loading="lazy">
+            <p class="lore-meta">H4J1ME racer · No. 07</p>
+            <h3>TSUB4S4</h3>
+            <p class="cast-reading">Tsubasa</p>
+            <p>Tsubasa means wing. She’s the fastest racer in Future, and she acts like she knows it. Behind the bravado, she worries about being replaceable, especially when she’s asked to test a frame that can fly without her.</p>
+            <p>H4J1ME takes its name from the Japanese word for start. Its pilots race above the clouds to trance. High-visibility yellow, cropped shells, harnesses and race numbers carry The Deck into the Kurowear collection.</p>
+            <dl class="cast-facts">
+              <div><dt>Sound</dt><dd>Trance</dd></div>
+              <div><dt>Style</dt><dd>Kurowear</dd></div>
+              <div><dt>Base</dt><dd><a href="#place-deck">The Deck <span aria-hidden="true">↗</span></a></dd></div>
+            </dl>
+            <a class="lore-text-link" href="index.html#style-kurowear">Explore Kurowear <span aria-hidden="true">↗</span></a>
+          </div>
+        </article>
+        <article id="cast-quant" class="cast-panel" data-panel data-color="silver">
+          <figure class="cast-picture"><img src="media/lore/cast-quant.webp" alt="QU4NT with a shaved head, a clear wraparound visor and a black Drawbridge jacket" width="496" height="386" loading="lazy" decoding="async"></figure>
+          <div class="cast-copy">
+            <img class="maker-mark" src="media/marks/8888-faction-01-wordmark.svg" alt="8888" width="210" height="48" loading="lazy">
+            <p class="lore-meta">Keeper of the city clock</p>
+            <h3>QU4NT</h3>
+            <p class="cast-reading">Quant</p>
+            <p>Calm, exact and usually done talking in four words, QU4NT keeps the city’s clock. A perfectionist who can’t switch off, they notice that somebody keeps resetting the districts’ schedules so their nights never overlap.</p>
+            <p>8888 writes four kicks in a bar as a name. The Grid’s minimal techno and clean silhouettes carry into the Techwear collection through precise cuts, quiet details and a restrained palette.</p>
+            <dl class="cast-facts">
+              <div><dt>Sound</dt><dd>Minimal techno</dd></div>
+              <div><dt>Style</dt><dd>Techwear</dd></div>
+              <div><dt>Base</dt><dd><a href="#place-grid">The Grid <span aria-hidden="true">↗</span></a></dd></div>
+            </dl>
+            <a class="lore-text-link" href="index.html#style-techwear">Explore Techwear <span aria-hidden="true">↗</span></a>
+          </div>
+        </article>
+        <article id="cast-vesper" class="cast-panel" data-panel data-color="violet">
+          <figure class="cast-picture"><img src="media/lore/cast-vesper.webp" alt="V3SP3R in a black hood, violet goggles and a respirator" width="496" height="386" loading="lazy" decoding="async"></figure>
+          <div class="cast-copy">
+            <img class="maker-mark" src="media/marks/r4v3ns-faction-03-v8-wordmark.svg" alt="R4V3NS" width="210" height="48" loading="lazy">
+            <p class="lore-meta">Keeper of The Archive</p>
+            <h3>V3SP3R</h3>
+            <p class="cast-reading">Vesper</p>
+            <p>Tall, formal and quietly kind, V3SP3R guards the city’s memory. They are shy behind the mask. L0WK3Y keeps inviting them onto the radio, and the answer is always “Perhaps next time.”</p>
+            <p>R4V3NS brings Victorian and cyber goth together under The Archive’s purple lights. Industrial music, black layers, silver hardware and a flash of ultraviolet define the Goth collection.</p>
+            <dl class="cast-facts">
+              <div><dt>Sound</dt><dd>Industrial</dd></div>
+              <div><dt>Style</dt><dd>Goth</dd></div>
+              <div><dt>Base</dt><dd><a href="#place-archive">The Archive <span aria-hidden="true">↗</span></a></dd></div>
+            </dl>
+            <a class="lore-text-link" href="index.html#style-goth">Explore Goth <span aria-hidden="true">↗</span></a>
+          </div>
+        </article>
+        <article id="cast-lowkey" class="cast-panel" data-panel data-color="orange">
+          <figure class="cast-picture"><img src="media/lore/cast-lowkey.webp" alt="L0WK3Y smiling in a black ROLL3RZ cap" width="496" height="386" loading="lazy" decoding="async"></figure>
+          <div class="cast-copy">
+            <img class="maker-mark" src="media/marks/roll3rz-double-link-r1.svg" alt="ROLL3RZ" width="210" height="48" loading="lazy">
+            <p class="lore-meta">ROLL3RZ captain and radio MC · No. 23</p>
+            <h3>L0WK3Y</h3>
+            <p class="cast-reading">Low Key</p>
+            <p>L0WK3Y is the loudest person in the room and the one who makes sure his crew gets home. As The Yard’s captain and pirate-radio MC, he has to decide how much freedom he’s willing to give up to keep the venue open.</p>
+            <p>ROLL3RZ runs on drum and bass and team loyalty. Electric orange, oversized numbered jerseys, racing stripes and caps make up its Track Techwear look.</p>
+            <dl class="cast-facts">
+              <div><dt>Sound</dt><dd>Drum and bass</dd></div>
+              <div><dt>Style</dt><dd>Track Techwear</dd></div>
+              <div><dt>Base</dt><dd><a href="#place-yard">The Yard <span aria-hidden="true">↗</span></a></dd></div>
+            </dl>
+            <a class="lore-text-link" href="index.html#style-track-techwear">Explore Track Techwear <span aria-hidden="true">↗</span></a>
+          </div>
+        </article>
+        <article id="cast-flat" class="cast-panel" data-panel data-color="silver">
+          <figure class="cast-picture"><img src="media/lore/cast-flat.webp" alt="Illustration of FL4T in a plain grey uniform holding a noise meter and clipboard" width="496" height="386" loading="lazy" decoding="async"></figure>
+          <div class="cast-copy">
+            <p class="plain-mark">M0N0</p>
+            <p class="lore-meta">M0N0 officer</p>
+            <h3>FL4T</h3>
+            <p class="cast-reading">Flat</p>
+            <p>FL4T is an unfailingly polite officer who apologises before asking the room to turn down the music. They believe the rules keep people safe. At The Circuit they are the first from M0N0 to take off the earpiece and join the dance.</p>
+            <p>M0N0 is faction 00, the one missing from the city’s public roster. It believes a single approved tempo would be kinder and uses licensing, curfews and clock resets to keep the districts apart. Its staff wear plain grey uniforms.</p>
+            <dl class="cast-facts">
+              <div><dt>Sound</dt><dd>One approved tempo</dd></div>
+              <div><dt>Style</dt><dd>Grey uniform</dd></div>
+              <div><dt>Status</dt><dd>Faction 00</dd></div>
+            </dl>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="story" class="lore-shell lore-section" aria-labelledby="story-title">
+      <header class="lore-section-head">
+        <h2 id="story-title">The story<span>.</span></h2>
+        <p>One pirate signal, six chapters, and a floor for the whole city.</p>
+      </header>
+      <div class="story-explorer" data-explorer>
+        <div class="story-tabs" data-tabs aria-label="Story chapters" aria-orientation="vertical" hidden>
+            <button type="button" data-target="story-signal"><span class="chapter-number">00</span><span>Signal Found</span></button>
+            <button type="button" data-target="story-start"><span class="chapter-number">01</span><span>Start Signal</span></button>
+            <button type="button" data-target="story-four"><span class="chapter-number">02</span><span>Four to the Floor</span></button>
+            <button type="button" data-target="story-remembers"><span class="chapter-number">03</span><span>What the Archive Remembers</span></button>
+            <button type="button" data-target="story-proof"><span class="chapter-number">04</span><span>Proof</span></button>
+            <button type="button" data-target="story-licence"><span class="chapter-number">05</span><span>Licence</span></button>
+            <button type="button" data-target="story-b2b"><span class="chapter-number">06</span><span>B2B</span></button>
+        </div>
+        <div class="story-main">
+          <article id="story-signal" class="story-panel" data-panel>
+            <img src="media/lore/story-signal.webp" alt="R2 broadcasts from a rooftop radio rig in the rain" width="1240" height="698" loading="lazy" decoding="async">
+            <div class="story-copy">
+              <p class="lore-meta">Teaser <span aria-hidden="true">/</span> R2</p>
+              <h3>Signal Found</h3>
+              <p>R2 discovers a pirate frequency that reaches beyond Future, all the way into our present. From a rooftop radio rig, he sends the first piece of clothing through the signal.</p>
+              <a class="lore-text-link" href="#cast-r2">Character profile <span aria-hidden="true">↗</span></a>
+            </div>
+          </article>
+          <article id="story-start" class="story-panel" data-panel>
+            <img src="media/lore/story-start.webp" alt="TSUB4S4 examines an empty cockpit while FL4T holds a clipboard" width="1240" height="698" loading="lazy" decoding="async">
+            <div class="story-copy">
+              <p class="lore-meta">Chapter 1 <span aria-hidden="true">/</span> H4J1ME · The Deck</p>
+              <h3>Start Signal</h3>
+              <p>TSUB4S4 is asked to test a frame that can fly without her. Where a pilot should sit there is empty space, and the serial number begins with two zeros.</p>
+              <a class="lore-text-link" href="#cast-tsubasa">Character profile <span aria-hidden="true">↗</span></a>
+            </div>
+          </article>
+          <article id="story-four" class="story-panel" data-panel>
+            <img src="media/lore/story-four.webp" alt="QU4NT studies a wall of district clocks in The Grid" width="1240" height="698" loading="lazy" decoding="async">
+            <div class="story-copy">
+              <p class="lore-meta">Chapter 2 <span aria-hidden="true">/</span> 8888 · The Grid</p>
+              <h3>Four to the Floor</h3>
+              <p>QU4NT discovers that somebody has been resetting the district clocks. The nights never line up, and people who could share a dance floor never even arrive at the same time.</p>
+              <a class="lore-text-link" href="#cast-quant">Character profile <span aria-hidden="true">↗</span></a>
+            </div>
+          </article>
+          <article id="story-remembers" class="story-panel" data-panel>
+            <img src="media/lore/story-remembers.webp" alt="V3SP3R plays an old recording under purple light in The Archive" width="1240" height="698" loading="lazy" decoding="async">
+            <div class="story-copy">
+              <p class="lore-meta">Chapter 3 <span aria-hidden="true">/</span> R4V3NS · The Archive</p>
+              <h3>What the Archive Remembers</h3>
+              <p>V3SP3R recovers a recording of all five districts dancing on one floor. The Circuit was closed on the grounds of safety. The order is signed M0N0.</p>
+              <a class="lore-text-link" href="#cast-vesper">Character profile <span aria-hidden="true">↗</span></a>
+            </div>
+          </article>
+          <article id="story-proof" class="story-panel" data-panel>
+            <img src="media/lore/story-proof.webp" alt="Sasha looks at a foundry order held by FL4T" width="1240" height="698" loading="lazy" decoding="async">
+            <div class="story-copy">
+              <p class="lore-meta">Chapter 4 <span aria-hidden="true">/</span> МОЛОТ · Factory 04</p>
+              <h3>Proof</h3>
+              <p>Sasha finds an order for a hundred racing frames with no seats. She refuses to put her proof mark on them.</p>
+              <a class="lore-text-link" href="#cast-sasha">Character profile <span aria-hidden="true">↗</span></a>
+            </div>
+          </article>
+          <article id="story-licence" class="story-panel" data-panel>
+            <img src="media/lore/story-licence.webp" alt="L0WK3Y looks over the licence at the pirate station" width="1240" height="698" loading="lazy" decoding="async">
+            <div class="story-copy">
+              <p class="lore-meta">Chapter 5 <span aria-hidden="true">/</span> ROLL3RZ · The Yard</p>
+              <h3>Licence</h3>
+              <p>M0N0 offers L0WK3Y a licence to keep The Yard open if his station plays just one tempo. He turns it down and opens the frequency to all five districts.</p>
+              <a class="lore-text-link" href="#cast-lowkey">Character profile <span aria-hidden="true">↗</span></a>
+            </div>
+          </article>
+          <article id="story-b2b" class="story-panel" data-panel>
+            <img src="media/lore/story-b2b.webp" alt="The DJs and all five crowds come together in The Circuit" width="1240" height="698" loading="lazy" decoding="async">
+            <div class="story-copy">
+              <p class="lore-meta">Chapter 6 <span aria-hidden="true">/</span> M0N0 · The Circuit</p>
+              <h3>B2B</h3>
+              <p>M0N0 plays its single tempo to a still room. R2 brings in all five sounds, one by one. FL4T takes off the grey earpiece and starts to dance. The DJs play back to back, and The Circuit becomes one floor again.</p>
+              <a class="lore-text-link" href="#cast-flat">Character profile <span aria-hidden="true">↗</span></a>
+            </div>
+          </article>
+          <div class="story-controls" data-step-controls hidden>
+            <button type="button" data-step="-1">← Previous</button>
+            <span data-count aria-live="polite"></span>
+            <button type="button" data-step="1">Next →</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="lore-outro">
+      <div class="lore-shell">
+        <p>We wear the future<span>.</span></p>
+        <div><a class="lore-button" href="index.html#show">Watch the Show <span aria-hidden="true">↗</span></a><a class="lore-text-link" href="index.html#merchandise">Shop the collections <span aria-hidden="true">↗</span></a></div>
+      </div>
+    </aside>
+  </main>
+  <footer class="lore-footer">
+    <div class="lore-shell lore-topbar">
+      <a class="logo" href="index.html" aria-label="FU7URE home"><img src="media/marks/fu7ure-wordmark-r1.svg" alt="" width="852" height="148"></a>
+      <a class="lore-text-link" href="#lore-main">Back to top <span aria-hidden="true">↑</span></a>
+    </div>
+  </footer>
+</body>
+</html>

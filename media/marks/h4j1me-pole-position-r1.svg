@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="708" height="130" viewBox="160 480 708 130" role="img" aria-label="H4J1ME">
+  <g transform="translate(190.81 488) scale(0.97 1.09) skewX(-13)" fill="#f3efe3" aria-label="H4J1ME">
+    <path aria-label="H" transform="translate(0)" d="M0 104V16Q0 0 16 0H24V41H77V16Q77 0 93 0H101V88Q101 104 85 104H77V63H24V88Q24 104 8 104Z" />
+    <path aria-label="4" transform="translate(117)" d="M36 0H62L26 55H64V25Q64 12 78 12H87V55H102V76H87V104H64V76H0V58Z" />
+    <path aria-label="J" transform="translate(234)" d="M11 0H102V67Q102 82 91 93Q80 104 65 104H27Q0 104 0 77V64H23V76Q23 82 30 82H61Q78 82 78 66V22H0V11Z" />
+    <path aria-label="1" transform="translate(351)" d="M4 23L25 2Q27 0 32 0H62V82H102V93Q102 104 91 104H0V82H39V24L20 43Z" />
+    <path aria-label="M" transform="translate(468)" d="M0 104V16Q0 0 16 0H23L56 32L89 0H96Q112 0 112 16V104H89V35L56 68L23 35V104Z" />
+    <path aria-label="E" transform="translate(585)" d="M0 25Q0 0 25 0H102V9L89 22H29Q24 22 24 27V41H94V52L83 63H24V77Q24 82 29 82H102V91L89 104H25Q0 104 0 79Z" />
+  </g>
+</svg>

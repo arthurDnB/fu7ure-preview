@@ -40,15 +40,15 @@
 
   const sceneDesigns = {
     "r2-sasha": {
-      brands: [{ name: "R2", logo: "r2" }, { name: "MOLOT", logo: "molot" }],
+      brands: [{ name: "R2", logo: "r2-pin-stack-r1.svg" }, { name: "MOLOT", logo: "molot-coupler-r1.svg" }],
       front: [[.365, .39], [.62, .405]], rear: [[.64, .41], [.34, .40]],
     },
     "tsubasa-qu4nt": {
-      brands: [{ name: "H4J1ME", logo: "h4j1me" }, { name: "8888", logo: "8888" }],
+      brands: [{ name: "H4J1ME", logo: "h4j1me-pole-position-r1.svg" }, { name: "8888", logo: "8888-faction-01-wordmark.svg" }],
       front: [[.33, .40], [.665, .365]], rear: [[.67, .41], [.328, .385]],
     },
     "v3sp3r-l0wk3y": {
-      brands: [{ name: "R4V3NS", logo: "ravens" }, { name: "ROLL3RZ", logo: "rollers" }],
+      brands: [{ name: "R4V3NS", logo: "r4v3ns-faction-03-v8-wordmark.svg" }, { name: "ROLL3RZ", logo: "roll3rz-double-link-r1.svg" }],
       front: [[.365, .415], [.663, .395]], rear: [[.655, .414], [.332, .391]],
       finish: [[.587, .395], [.753, .344]],
     },
@@ -113,7 +113,7 @@
       element.dataset.tone = style.tone;
       label.textContent = style.name;
       const mark = scene.design.brands[styleIndex];
-      logo.src = "media/marks/" + mark.logo + ".png";
+      logo.src = "media/marks/" + mark.logo;
       logo.alt = mark.name;
       logo.title = mark.name;
       link.href = style.href;

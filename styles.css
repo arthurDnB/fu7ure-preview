@@ -40,10 +40,11 @@ figure, p { margin: 0; }
   display: grid; grid-template-columns: 1fr minmax(0, auto) 1fr; align-items: center;
 }
 .logo {
-  justify-self: start; font-family: var(--display); font-weight: 950;
-  font-size: 28px; letter-spacing: -.075em; line-height: 1; white-space: nowrap;
+  display: inline-flex; align-items: center; justify-self: start;
+  min-height: 40px;
 }
-.logo span, h1 span { color: var(--accent); }
+.logo img { width: clamp(96px, 10vw, 145px); height: auto; }
+h1 span { color: var(--accent); }
 .header-actions { justify-self: end; display: flex; align-items: center; gap: 8px; }
 .motion-button, .bag-toggle {
   font: 12px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase;
@@ -94,7 +95,7 @@ figure, p { margin: 0; }
   position: absolute; inset: 0; content: ""; pointer-events: none;
 }
 .artwork::before {
-  background: #161917 var(--scene-image, url("media/r2-sasha-olive-front.webp")) center / cover;
+  background: #161917 var(--scene-image, url("media/r2-sasha-wardrobe-front.webp")) center / cover;
   transform: scale(1.06); filter: blur(17px) brightness(.59) saturate(.9);
 }
 .artwork::after {
@@ -212,7 +213,6 @@ h1 {
 
 @media (max-width: 760px) {
   :root { --header: 54px; --gutter: 16px; --stage-height: calc(100svh - var(--header)); }
-  .logo { font-size: 23px; }
   .motion-button, .bag-toggle { min-height: 34px; padding: 7px 8px; font-size: 10px; gap: 6px; }
   .stage-heading { top: 25px; }
   .stage-index, .view-label, .orbit { font-size: 10px; }
@@ -284,8 +284,11 @@ h1 {
   display: inline-flex; align-self: center; align-items: center; gap: 7px;
   color: var(--muted); font: clamp(11px, 1.25vw, 15px)/1 var(--mono); letter-spacing: .03em;
 }
-.collection-credit img { width: auto; max-width: clamp(78px, 14vw, 156px); height: clamp(15px, 2.4vw, 28px); object-fit: contain; }
-.collection-credit img[alt="R4V3NS"] { height: clamp(19px, 3vw, 36px); }
+.collection-credit img {
+  width: auto; max-width: clamp(92px, 13vw, 156px);
+  height: clamp(18px, 2.3vw, 30px); object-fit: contain;
+}
+.collection-credit img[alt="R2"] { height: clamp(26px, 3.25vw, 44px); }
 .collection-header p { color: var(--muted); font-size: clamp(14px, 1.35vw, 18px); line-height: 1.4; }
 .products {
   display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -356,7 +359,10 @@ h1 {
   display: grid; justify-items: start; row-gap: 3px; margin: 0;
   font-family: var(--display); font-weight: 950; line-height: .91; letter-spacing: -.075em;
 }
-.closing-brand { font-size: clamp(47px, 8vw, 126px); }
+.closing-brand {
+  width: clamp(222px, 36vw, 580px); height: auto;
+  filter: drop-shadow(0 2px 9px #0a0c0a) drop-shadow(0 4px 22px #0a0c0a);
+}
 .closing-domain { font-size: clamp(22px, 3.45vw, 56px); letter-spacing: .01em; }
 .closing-accent { color: var(--accent); }
 .closing-tagline {
@@ -368,9 +374,9 @@ h1 {
 .closing-still .closing-message { top: 50%; margin: 0; color: var(--ink); }
 @media (max-width: 600px) {
   .stage .closing-message { top: clamp(44px, 10vh, 86px); transform: none; }
-  .stage .closing-brand { font-size: clamp(40px, 11.5vw, 66px); }
+  .stage .closing-brand { width: clamp(200px, 58vw, 340px); }
   .stage .closing-domain { font-size: clamp(20px, 5.2vw, 31px); }
-  .closing-still .closing-brand { font-size: clamp(24px, 8vw, 47px); }
+  .closing-still .closing-brand { width: clamp(132px, 42vw, 230px); }
   .closing-still .closing-domain { font-size: clamp(13px, 3.6vw, 23px); }
   .closing-still .closing-tagline { margin-top: 7px; }
 }
@@ -730,8 +736,8 @@ html:has(.photo-viewer[open]) { overflow: hidden; }
   display: flex; align-items: center; gap: 5px;
   color: #bdb9ad; font: 11px/1 var(--mono); letter-spacing: .035em;
 }
-.style-credit img { width: auto; max-width: 81px; height: 13px; object-fit: contain; }
-.style-credit img[alt="R4V3NS"] { height: 17px; }
+.style-credit img { width: auto; max-width: 81px; height: 16px; object-fit: contain; }
+.style-credit img[alt="R2"] { height: 24px; }
 .callout-pin, .callout-line {
   position: absolute; left: var(--pin-x); top: var(--pin-y);
   background: var(--style-ink); pointer-events: none;
@@ -748,7 +754,8 @@ html:has(.photo-viewer[open]) { overflow: hidden; }
   .callout .style-link { padding: 7px 8px; font-size: clamp(14px, 3.9vw, 22px); }
   .style-tag { gap: 4px; }
   .style-credit { font-size: 10px; }
-  .style-credit img { height: 11px; }
+  .style-credit img { height: 13px; }
+  .style-credit img[alt="R2"] { height: 20px; }
 }
 
 /* Content stays fully visible when scroll-driven animation is unavailable or off. */

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="748" height="128" viewBox="143 470 748 128" role="img" aria-label="ROLL3RZ">
+  <g transform="translate(163 478) scale(1.0 1.12) skewX(-6)" fill="#f3efe3" fill-rule="evenodd" aria-label="ROLL3RZ">
+    <path d="M0 100V12L12 0H77L90 13V55L77 68H66L89 91V100H68L37 69H22V100Z M22 21V46H60L68 38V28L61 21Z" transform="translate(0)" aria-label="R" />
+    <path d="M0 17L17 0H73L90 17V83L73 100H17L0 83Z M29 22L22 29V71L29 78H61L68 71V29L61 22Z" transform="translate(105)" aria-label="O" />
+    <path d="M0 100V13L13 0H23V77H88V88L76 100Z" transform="translate(210)" aria-label="L" />
+    <path d="M0 100V13L13 0H23V77H88V88L76 100Z" transform="translate(315)" aria-label="L" />
+    <path d="M0 14L14 0H76L90 14V42L81 51L90 60V86L76 100H14L0 86V74H22L27 79H62L68 73V64L62 58H31V42H62L68 36V27L62 21H28L22 27H0Z" transform="translate(420)" aria-label="3" />
+    <path d="M0 100V12L12 0H77L90 13V55L77 68H66L89 91V100H68L37 69H22V100Z M22 21V46H60L68 38V28L61 21Z" transform="translate(525)" aria-label="R" />
+    <path d="M0 12L12 0H90V24L34 78H90V89L79 100H0V77L54 22H0Z" transform="translate(630)" aria-label="Z" />
+  </g>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="452" height="418" viewBox="286 68 452 418" role="img" aria-label="R2">
+  <path d="M294 108L326 76H510L494 92H333L310 115V197H294Z M730 446L698 478H530L546 462H691L714 439V359H730Z" fill="#f3efe3" />
+  <g aria-label="R2" fill-rule="evenodd">
+    <path d="M0 112V23Q0 0 23 0H98Q122 0 122 24V35Q122 48 112 58L90 80H68L54 66H26V112Z  M26 30V45H78L95 30V26Q95 23 91 23H33Q26 23 26 30Z M75 85H99L120 106V112H102Z" aria-label="R" transform="translate(330 111) scale(2.19 1.5)" fill="#f3efe3" />
+    <path d="M0 0H104Q124 0 124 20V30Q124 43 113 54L102 65H45L26 84V89H123V101L112 112H0V74L33 41H88L98 31V25H0Z" aria-label="2" transform="translate(430 287) scale(2.0 1.48)" fill="#f3efe3" />
+  </g>
+  <path d="M672 253H704V276H649Z" fill="#f5b45f" />
+</svg>

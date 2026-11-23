@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="696" height="184" viewBox="164 426 696 184" role="img" aria-label="8888">
+  <defs>
+    <path id="eight" fill-rule="evenodd" d="       M24 0H128L152 24V66L136 82L152 98V144L128 168H24L0 144V98L16 82L0 66V24Z       M42 28H110L118 36V54L110 62H42L34 54V36Z       M42 100H110L118 108V132L110 140H42L34 132V108Z" />
+  </defs>
+  <g transform="translate(172 434)" fill="#f3efe3">
+    <use href="#eight" />
+    <use href="#eight" x="176" />
+    <use href="#eight" x="352" />
+    <use href="#eight" x="528" />
+  </g>
+</svg>

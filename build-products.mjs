@@ -57,7 +57,7 @@ for (const item of items) {
     description,
     image: imageUrl,
     url,
-    brand: { "@type": "Brand", name: group.maker },
+    brand: { "@type": "Brand", name: group.maker, logo: absolute(group.mark) },
     category: group.style,
   }).replaceAll("<", "\\u003c");
   const meta = [

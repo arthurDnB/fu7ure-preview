@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="852" height="148" viewBox="22 22 852 148" role="img" aria-label="FU7URE">
+  <defs>
+    <path id="u" d="M0 0H32V105L46 119H84L98 105V15L113 0H130V118L100 148H30L0 118Z" />
+  </defs>
+  <g transform="translate(22 22)" fill="#f3efe3">
+    <path aria-label="F" d="M0 148V24L24 0H129V12L112 29H33V57H109V69L94 84H33V130L15 148Z" />
+    <use href="#u" x="143" aria-label="U" />
+    <g transform="translate(287)" aria-label="7">
+      <path d="M0 16L16 0H137V23L61 148H24L95 29H0Z" />
+      <path d="M110 0H137V20L119 38H100L110 20Z" fill="#f5b45f" />
+    </g>
+    <use href="#u" x="432" aria-label="U" />
+    <path transform="translate(576)" aria-label="R" fill-rule="evenodd" d="M0 148V24L24 0H102L130 28V67L108 89H87L132 135V148H102L52 96H32V130L14 148Z              M32 28V64H86L98 52V39L87 28Z" />
+    <path transform="translate(724)" aria-label="E" d="M0 148V24L24 0H128V11L111 28H32V55H113V66L96 83H32V119H128V131L111 148Z" />
+  </g>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="668" height="132" viewBox="180 506 668 132" role="img" aria-label="MOLOT">
+  <g transform="translate(188 514) scale(1.02 1.1)" aria-label="МОЛОТ" fill="#f3efe3" fill-rule="evenodd">
+    <path aria-label="М" transform="translate(0)" d="M0 104V16L16 0H30L55 25L80 0H94L110 16V104H88V35L55 68L22 35V104Z" />
+    <path aria-label="О" transform="translate(132)" d="M21 0H74L86 12L93 5L110 22V83L89 104H21L0 83V21Z M31 21L22 30V74L31 83H79L88 74V30L79 21Z" />
+    <path aria-label="Л" transform="translate(264)" d="M0 104L38 0H92L110 18V104H88V23H62L31 104Z" />
+    <path aria-label="О" transform="translate(396)" d="M21 0H74L86 12L93 5L110 22V83L89 104H21L0 83V21Z M31 21L22 30V74L31 83H79L88 74V30L79 21Z" />
+    <path aria-label="Т" transform="translate(528)" d="M0 13L13 0H110V22H66V104H44V22H0Z" />
+  </g>
+</svg>

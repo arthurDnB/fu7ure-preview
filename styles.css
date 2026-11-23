@@ -94,7 +94,7 @@ figure, p { margin: 0; }
   position: absolute; inset: 0; content: ""; pointer-events: none;
 }
 .artwork::before {
-  background: #161917 var(--scene-image, url("media/r2-sasha-front.webp")) center / cover;
+  background: #161917 var(--scene-image, url("media/r2-sasha-olive-front.webp")) center / cover;
   transform: scale(1.06); filter: blur(17px) brightness(.59) saturate(.9);
 }
 .artwork::after {

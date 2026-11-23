@@ -21,7 +21,9 @@
         document.body.append(catalog.querySelector("#" + id));
       }
     } catch {
-      byId("product-message").textContent = "The product catalog is unavailable. Return to the shop to try again.";
+      const message = byId("product-message");
+      message.textContent = "The interactive product catalog is unavailable. Return to the shop to try again.";
+      message.hidden = false;
       return;
     }
   }
@@ -33,6 +35,9 @@
   const summary = byId("catalog-summary");
   const noResults = byId("catalog-empty");
   const search = byId("shop-search");
+  const makerFilter = byId("catalog-maker");
+  const sizeFilter = byId("catalog-size");
+  const sortFilter = byId("catalog-sort");
   const dialog = byId("product-preview");
   const purchaseForm = byId("product-purchase");
   const sizeSelect = byId("preview-size");
@@ -42,36 +47,16 @@
   const bagTemplate = byId("bag-item-template");
   const checkoutDialog = byId("demo-checkout");
   const checkoutButton = byId("bag-checkout");
-  const shippingForm = byId("shipping-form");
-  const shippingReview = byId("shipping-review");
-  const checkoutComplete = byId("checkout-complete");
   const bagKey = "fu7ure-preview:bag";
   const supportsBag = typeof bagDialog.showModal === "function";
   const numberFormat = new Intl.NumberFormat("en-AU");
+  const decimalFormat = new Intl.NumberFormat("en-AU", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const categoryButtons = browse ? [...browse.querySelectorAll("[data-category]")] : [];
   const audienceInputs = browse ? [...browse.querySelectorAll("[name=shop-look]")] : [];
   const mainLinks = [...document.querySelectorAll(".store-nav a")];
   const ownCategories = new Set(["Tops", "Bottoms", "Outerwear", "Footwear"]);
   const angleSources = window.fu7ureProductAngles || {};
-  const descriptions = {
-    "cybercore-chest-harness": "Black shoulder straps and front buckles layered over a fitted top.",
-    "cybercore-controller-bag": "A crossbody bag with a wide strap and compact silhouette.",
-    "cybercore-amber-helmet": "A black full-face helmet with swept ears and amber rings.",
-    "cybercore-oversized-pilot-cargos": "A broad cargo silhouette that gathers below the knee.",
-    "warcore-olive-utility-vest": "An olive utility vest with stacked front pockets and rear webbing.",
-    "kurowear-yellow-panel-shell": "An asymmetric yellow sleeve breaks up a black hooded shell.",
-    "kurowear-pilot-boots": "Black and white boots with yellow pull tabs and chunky soles.",
-    "kurowear-rex-g7": "A dark faceplate, round brow pieces and sharp yellow lines.",
-    "techwear-reflective-jacket": "A clean black utility jacket with contrast piping and a tall collar.",
-    "techwear-wraparound-visor": "A clear visor with a broad wraparound profile.",
-    "goth-laced-hooded-coat": "A full-length black hooded coat with lacing and metal hardware.",
-    "goth-violet-goggles": "Round violet lenses framed by the black hood.",
-    "goth-platform-boots": "Tall black soles under the hem of the laced coat.",
-    "track-techwear-racing-jersey": "A boxy black jersey with an orange 23 and contrast sleeve trim.",
-    "track-techwear-race-stripe-cargos": "A relaxed black cargo cut with orange stripes and zipped pockets.",
-    "track-techwear-track-cap": "A curved-brim black cap worn with the Track Techwear look.",
-    "track-techwear-comms-earpiece": "An orange-accented earpiece with a short boom mic.",
-  };
+  const catalogContent = window.fu7ureCatalog || { details: {}, products: [] };
 
   const clothingSizes = ["XS", "S", "M", "L", "XL", "XXL"];
   const gearSizes = ["S", "M", "L", "XL"];
@@ -87,31 +72,73 @@
     "goth-half-face-respirator": ["S", "M", "L"],
   };
 
+  const concepts = new Map(catalogContent.products.map((item) => [item.key, item]));
+  for (const item of concepts.values()) {
+    const collection = styles.querySelector("#" + item.collection);
+    if (!collection) continue;
+    const destination = item.collection === "style-track-techwear" && ownCategories.has(item.type)
+      ? collection.querySelector(".products")
+      : collection.querySelector(".product-expander .products") || collection.querySelector(".products");
+    const card = document.createElement("li");
+    card.className = "product";
+    card.dataset.productKey = item.key;
+    const image = document.createElement("img");
+    image.src = item.image;
+    image.alt = item.name;
+    image.width = image.height = 512;
+    image.loading = "lazy";
+    const caption = document.createElement("div");
+    caption.className = "product-caption";
+    const heading = document.createElement("h4");
+    heading.textContent = item.name;
+    const price = document.createElement("data");
+    price.className = "product-price";
+    price.value = item.price;
+    price.textContent = money(item.price);
+    const type = document.createElement("span");
+    type.textContent = item.type;
+    caption.append(heading, price, type);
+    card.append(image, caption);
+    destination.append(card);
+  }
+
   const products = [...styles.querySelectorAll(".product")].map((card, index) => {
     const collection = card.closest(".collection");
     const image = card.querySelector("img");
-    const name = card.querySelector("h4, h5").textContent;
+    const heading = card.querySelector("h4, h5");
     const type = card.querySelector(".product-caption > span")?.textContent || "Accessories";
     const style = collection.querySelector(".collection-name").textContent;
     const credit = collection.querySelector(".collection-credit");
+    const maker = credit.querySelector("img").alt;
     const price = card.querySelector(".product-price");
     const src = image.getAttribute("src");
-    const key = src.split("/").pop().replace(/\.webp$/, "");
+    const key = card.dataset.productKey || src.split("/").pop().replace(/\.webp$/, "");
+    const specifications = concepts.get(key) || catalogContent.details[key];
+    const name = specifications?.name || heading.textContent;
+    heading.textContent = name;
+    image.alt = name;
+    const sizes = sizesByProduct[key] || sizesByType[type] || ["One size"];
+    const position = [...key].reduce((sum, character) => sum + character.charCodeAt(0), 0);
+    const stock = Object.fromEntries(sizes.map((size, i) => [
+      size, i === sizes.length - 1 && sizes.length > 2 && position % 3 === 0 ? 0 : 5 + (position + i) % 8,
+    ]));
     return {
-      index, card, template: card.cloneNode(true), name, type, style, credit, key, price,
-      sizes: sizesByProduct[key] || sizesByType[type] || ["One size"],
+      index, card, template: card.cloneNode(true), name, type, style, credit, maker, key, price,
+      specifications, sizes, stock,
       audience: collection.dataset.look,
       collection: collection.id,
       category: ownCategories.has(type) ? type : "Accessories",
-      frames: [{ src, label: "Main view" }, ...(angleSources[key] || [])],
+      frames: [{ src, label: "Main view" }, ...(concepts.get(key)?.angles || angleSources[key] || [])],
       alt: image.alt,
     };
   });
 
   const productsByKey = new Map(products.map((product) => [product.key, product]));
-  const productUrl = (product) => "product.html?item=" + encodeURIComponent(product.key);
+  const productUrl = (product) => "products/" + encodeURIComponent(product.key) + ".html";
   const bagLineKey = (key, size) => key + ":" + size;
-  const money = (amount) => "A$" + numberFormat.format(amount);
+  function money(amount) {
+    return "A$" + (Number.isInteger(amount) ? numberFormat : decimalFormat).format(amount);
+  }
   let bag = loadBag();
   let previewProduct;
   let category = "style";
@@ -207,6 +234,8 @@
   function renderCatalog() {
     const audience = audienceInputs.find((input) => input.checked).value;
     const terms = search.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    const maker = makerFilter.value;
+    const size = sizeFilter.value;
     const byStyle = category === "style";
     categoryButtons.forEach((button) => {
       button.setAttribute("aria-pressed", String(button.dataset.category === category));
@@ -220,11 +249,19 @@
     }
 
     const matches = products.filter((item) => {
-      const text = [item.name, item.style, item.type, item.category].join(" ").toLowerCase();
+      const text = [item.name, item.style, item.maker, item.type, item.category, item.specifications?.description].join(" ").toLowerCase();
       return (category === "all" || item.category === category) &&
         (audience === "all" || item.audience === audience) &&
+        (!maker || item.maker === maker) &&
+        (!size || item.stock[size] > 0) &&
         terms.every((term) => text.includes(term));
     });
+    const comparators = {
+      "price-up": (a, b) => Number(a.price.value) - Number(b.price.value),
+      "price-down": (a, b) => Number(b.price.value) - Number(a.price.value),
+      name: (a, b) => a.name.localeCompare(b.name, "en-AU"),
+    };
+    if (sortFilter.value) matches.sort(comparators[sortFilter.value]);
     productList.replaceChildren(...matches.map((item) => enhanceCard(item.template.cloneNode(true), item, true)));
     noResults.hidden = matches.length !== 0;
     const label = matches.length === 1 ? " piece" : " pieces";
@@ -236,6 +273,9 @@
     category = "style";
     audienceInputs[0].checked = true;
     search.value = "";
+    makerFilter.value = "";
+    sizeFilter.value = "";
+    sortFilter.value = "";
     renderCatalog();
   }
 
@@ -244,12 +284,38 @@
     renderCatalog();
   }
 
+  function initCatalogFilters() {
+    const makers = [...new Set(products.map((product) => product.maker))].sort();
+    makerFilter.append(...makers.map((maker) => new Option(maker, maker)));
+    const sizes = [...new Set([...clothingSizes, ...shoeSizes, "One size"])];
+    sizeFilter.append(...sizes.map((size) => new Option(size, size)));
+  }
+
+  function updateStock() {
+    if (!previewProduct) return;
+    const size = sizeSelect.value;
+    const available = previewProduct.stock[size];
+    const inBag = bag.get(bagLineKey(previewProduct.key, size))?.quantity || 0;
+    const status = byId("preview-stock");
+    const add = purchaseForm.querySelector('button[type="submit"]');
+    add.disabled = Boolean(size && available <= inBag);
+    status.toggleAttribute("data-unavailable", add.disabled);
+    status.textContent = !size ? "" : !available ? "Sold out in demo stock."
+      : available <= inBag ? "All demo stock for this size is in your bag."
+      : available + " available in demo stock.";
+  }
+
   function showProduct(product) {
     previewProduct = product;
     if (supportsBag) {
-      const sizes = product.sizes.map((size) => new Option(size, size));
+      const sizes = product.sizes.map((size) => {
+        const option = new Option(size + (product.stock[size] ? "" : " — sold out"), size);
+        option.disabled = !product.stock[size];
+        return option;
+      });
       if (sizes.length > 1) sizes.unshift(new Option("Select size", "", true, true));
       sizeSelect.replaceChildren(...sizes);
+      updateStock();
     }
     const holder = byId("preview-media");
     const image = document.createElement("img");
@@ -263,8 +329,24 @@
     previewPrice.textContent = product.price.textContent;
     byId("preview-type").textContent = product.style + " / " + product.category;
     const text = byId("preview-description");
-    text.textContent = descriptions[product.key] || "";
+    text.textContent = product.specifications?.description || "";
     text.hidden = !text.textContent;
+    const specs = byId("preview-specifications");
+    const rows = Object.entries({
+      "Sample materials": product.specifications?.materials,
+      "Sample care": product.specifications?.care,
+      Fit: product.specifications?.fit,
+    }).filter(([, value]) => value).map(([label, value]) => {
+      const row = document.createElement("div");
+      const term = document.createElement("dt");
+      const detail = document.createElement("dd");
+      term.textContent = label;
+      detail.textContent = value;
+      row.append(term, detail);
+      return row;
+    });
+    specs.replaceChildren(...rows);
+    specs.hidden = rows.length === 0;
     return gallery;
   }
 
@@ -360,7 +442,10 @@
     const fit = product.sizes.length === 1
       ? "This piece has one preview size."
       : fitNotes[product.type] || "";
-    byId("product-size-advice").textContent = [fit, "Final fit measurements will be available before launch."].filter(Boolean).join(" ");
+    const chart = productMeasurements(product);
+    const advice = chart ? "Use these sample measurements to test size selection." : "See the sample fit notes for this piece.";
+    byId("product-size-advice").textContent = [fit, advice].filter(Boolean).join(" ");
+    if (chart) byId("product-measurements").append(chart);
 
     toggle.addEventListener("click", () => {
       guide.hidden = !guide.hidden;
@@ -368,13 +453,48 @@
     });
   }
 
+  function productMeasurements(product) {
+    const measurements = {
+      chest: ["80–86", "87–93", "94–100", "101–107", "108–114", "115–121"],
+      waist: ["63–69", "70–76", "77–83", "84–90", "91–97", "98–104"],
+      palm: ["15–16", "16–18", "18–20", "20–22", "22–24", "24–26"],
+      head: ["52–54", "54–56", "56–58", "58–60", "60–62", "62–64"],
+    };
+    const measure = product.type === "Bottoms" ? "waist"
+      : product.type === "Gloves" ? "palm"
+      : /helmet|rex-g7/.test(product.key) ? "head" : "chest";
+    if (product.sizes.length === 1 || /respirator/.test(product.key)) return null;
+    const shoe = product.type === "Footwear";
+    const table = document.createElement("table");
+    table.className = "product-measurement-table";
+    table.createCaption().textContent = "Sample body measurements in cm";
+    const header = table.createTHead().insertRow();
+    for (const label of ["Size", shoe ? "Foot length" : measure[0].toUpperCase() + measure.slice(1)]) {
+      const cell = document.createElement("th");
+      cell.scope = "col";
+      cell.textContent = label;
+      header.append(cell);
+    }
+    const body = table.createTBody();
+    for (const [index, size] of product.sizes.entries()) {
+      const row = body.insertRow();
+      const heading = document.createElement("th");
+      heading.scope = "row";
+      heading.textContent = size;
+      row.append(heading);
+      row.insertCell().textContent = shoe ? (22.3 + index * 0.64).toFixed(1) : measurements[measure][clothingSizes.indexOf(size)];
+    }
+    return table;
+  }
+
   function renderProductPage() {
-    const key = new URLSearchParams(location.search).get("item");
+    const key = productPage.dataset.productKey || new URLSearchParams(location.search).get("item");
     const product = productsByKey.get(key);
     const message = byId("product-message");
     if (!product) {
       document.title = "Product not found · FU7URE";
       message.textContent = "This product could not be found. Browse the shop to find another piece.";
+      message.hidden = false;
       return;
     }
 
@@ -388,6 +508,7 @@
     renderProductPhotos(product, gallery);
     if (supportsBag) renderSizeGuide(product);
     byId("product-sheet").hidden = false;
+    byId("product-static")?.remove();
     message.hidden = true;
   }
 
@@ -398,8 +519,9 @@
       if (!Array.isArray(saved)) return lines;
       for (const line of saved) {
         const product = productsByKey.get(line?.key);
-        if (product?.sizes.includes(line.size) && Number.isSafeInteger(line.quantity) && line.quantity > 0) {
-          lines.set(bagLineKey(line.key, line.size), line);
+        if (product?.stock[line.size] > 0 && Number.isSafeInteger(line.quantity) && line.quantity > 0) {
+          const quantity = Math.min(line.quantity, product.stock[line.size]);
+          lines.set(bagLineKey(line.key, line.size), { key: line.key, size: line.size, quantity });
         }
       }
     } catch {
@@ -415,13 +537,13 @@
       // Keep the current bag in memory if storage becomes unavailable.
     }
     renderBag();
+    updateStock();
   }
 
   function renderBag() {
     let count = 0;
     let total = 0;
     const rows = [];
-    const summaryRows = [];
     for (const [id, { key, size, quantity }] of bag) {
       const product = productsByKey.get(key);
       const subtotal = Number(product.price.value) * quantity;
@@ -444,28 +566,18 @@
       const less = row.querySelector("[data-bag-action=decrease]");
       less.setAttribute("aria-label", "Decrease quantity of " + label);
       less.disabled = quantity === 1;
-      row.querySelector("[data-bag-action=increase]").setAttribute("aria-label", "Increase quantity of " + label);
+      const more = row.querySelector("[data-bag-action=increase]");
+      more.setAttribute("aria-label", "Increase quantity of " + label);
+      more.disabled = quantity >= product.stock[size];
       row.querySelector("[data-bag-action=remove]").setAttribute("aria-label", "Remove " + label);
       rows.push(row);
-
-      const summaryLine = document.createElement("li");
-      const details = document.createElement("span");
-      details.textContent = product.name + " · " + sizeLabel + " × " + quantity;
-      const amount = document.createElement("span");
-      amount.textContent = money(subtotal);
-      summaryLine.append(details, amount);
-      summaryRows.push(summaryLine);
     }
 
     bagItems.replaceChildren(...rows);
     byId("bag-empty").hidden = count > 0;
     byId("bag-count").textContent = count;
     byId("bag-total").value = money(total);
-    byId("checkout-items").replaceChildren(...summaryRows);
-    byId("checkout-subtotal").textContent = money(total);
-    byId("checkout-total").textContent = money(total);
     checkoutButton.disabled = count === 0;
-    if (!count && checkoutDialog.open && checkoutComplete.hidden) checkoutDialog.close();
   }
 
   function changeQuantity(event) {
@@ -484,12 +596,12 @@
       return;
     }
     const quantity = line.quantity + (action === "increase" ? 1 : -1);
-    if (quantity < 1 || !Number.isSafeInteger(quantity)) return;
+    if (quantity < 1 || quantity > productsByKey.get(line.key).stock[line.size]) return;
     line.quantity = quantity;
     saveBag();
-    const nextAction = action === "decrease" && quantity === 1 ? "increase" : action;
     const row = [...bagItems.children].find((item) => item.dataset.bagLine === bagLine);
-    row.querySelector('[data-bag-action="' + nextAction + '"]').focus({ preventScroll: true });
+    const sameControl = row.querySelector('[data-bag-action="' + action + '"]:enabled');
+    (sameControl || row.querySelector(".bag-quantity button:enabled")).focus({ preventScroll: true });
   }
 
   function initBag() {
@@ -498,14 +610,14 @@
     bagToggle.hidden = false;
     bagToggle.addEventListener("click", () => bagDialog.showModal());
     initCheckout();
+    sizeSelect.addEventListener("change", updateStock);
     purchaseForm.addEventListener("submit", (event) => {
       event.preventDefault();
       const size = sizeSelect.value;
-      const { key, sizes } = previewProduct;
-      if (!sizes.includes(size)) return;
+      const { key, stock } = previewProduct;
       const id = bagLineKey(key, size);
       const quantity = (bag.get(id)?.quantity || 0) + 1;
-      if (!Number.isSafeInteger(quantity)) return;
+      if (!(quantity <= stock[size])) return;
       bag.set(id, { key, size, quantity });
       saveBag();
       if (dialog?.open) dialog.close();
@@ -516,46 +628,26 @@
       if (event.key !== bagKey && event.key !== null) return;
       bag = loadBag();
       renderBag();
+      updateStock();
     });
   }
 
   function initCheckout() {
-    checkoutButton.addEventListener("click", () => {
-      if (bag.size) checkoutDialog.showModal();
+    const checkout = window.fu7ureCheckout?.init({
+      dialog: checkoutDialog,
+      money,
+      getOrder: () => [...bag.values()].map((line) => {
+        const product = productsByKey.get(line.key);
+        return { ...line, name: product.name, unitPrice: Number(product.price.value), image: product.frames[0].src };
+      }),
+      clearBag: () => {
+        bag.clear();
+        saveBag();
+      },
     });
-    shippingForm.addEventListener("submit", (event) => {
-      event.preventDefault();
-      if (!bag.size) return;
-      const data = new FormData(shippingForm);
-      const field = (name) => data.get(name).trim();
-      const locality = [field("city"), field("region"), field("postcode")].filter(Boolean).join(" ");
-      byId("shipping-address").textContent = [
-        field("name"), field("street"), field("unit"), locality, field("country"),
-      ].filter(Boolean).join("\n");
-      shippingForm.hidden = true;
-      shippingReview.hidden = false;
-      byId("review-heading").focus();
-    });
-    byId("edit-shipping").addEventListener("click", () => {
-      shippingReview.hidden = true;
-      shippingForm.hidden = false;
-      shippingForm.elements.namedItem("name").focus();
-    });
-    byId("finish-checkout").addEventListener("click", () => {
-      if (!bag.size) return;
-      shippingReview.hidden = true;
-      checkoutComplete.hidden = false;
-      shippingForm.reset();
-      byId("shipping-address").textContent = "";
-      byId("checkout-complete-title").focus();
-    });
-    checkoutDialog.addEventListener("close", () => {
-      shippingForm.reset();
-      shippingForm.hidden = false;
-      shippingReview.hidden = true;
-      checkoutComplete.hidden = true;
-      byId("shipping-address").textContent = "";
-    });
+    if (!checkout) return;
+    checkoutButton.addEventListener("click", () => checkout.open(checkoutButton));
+    byId("prototype-orders")?.addEventListener("click", (event) => checkout.openOrders(event.currentTarget));
   }
 
   function styleAnchor(hash) {
@@ -581,6 +673,7 @@
   if (productPage) {
     renderProductPage();
   } else {
+    initCatalogFilters();
     products.forEach((item) => enhanceCard(item.card, item, false));
     browse.hidden = false;
     browse.addEventListener("change", updateFilteredView);

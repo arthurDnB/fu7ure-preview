@@ -1,17 +1,26 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-AU">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#101211">
   <meta name="description" content="FU7URE ravewear and accessories. Explore the Show, discover the lore, and preview six collections.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="FU7URE — Ravewear &amp; Accessories">
+  <meta property="og:description" content="Six ravewear collections and a scroll-driven lookbook. Explore the first FU7URE drop.">
+  <meta property="og:image" content="https://arthurdnb.github.io/fu7ure-preview/media/v3sp3r-l0wk3y-finish.webp">
   <title>FU7URE — Ravewear &amp; Accessories</title>
   <link rel="preload" href="media/r2-sasha-front.webp" as="image">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="checkout-demo.css">
+  <link rel="stylesheet" href="prototype.css">
   <script defer src="media-config.js"></script>
   <script defer src="site.js"></script>
   <script defer src="product-angles.js"></script>
+  <script defer src="catalog-content.js"></script>
+  <script defer src="checkout-demo.js"></script>
   <script defer src="shop.js"></script>
+  <script defer src="prototype-tools.js"></script>
 </head>
 <body>
   <a class="skip-link" href="#lookbook">Skip to the lookbook</a>
@@ -152,7 +161,7 @@
         <header class="merch-header">
           <h2 id="merchandise-title">Shop<span>.</span></h2>
           <p>Rave apparel and accessories across six FU7URE styles.</p>
-          <p class="sample-prices">Sample prices in AUD. Final prices will be announced at launch.</p>
+          <p class="sample-prices">Prototype shop. Product specifications, stock and AUD prices are samples.</p>
         </header>
         <div class="shop-browse" id="shop-browse" hidden>
           <div class="browse-row">
@@ -162,7 +171,7 @@
               <label><input type="radio" name="shop-look" value="men"><span>Men’s looks</span></label>
               <label><input type="radio" name="shop-look" value="women"><span>Women’s looks</span></label>
             </fieldset>
-            <label class="shop-search"><span>Search the catalog</span><input id="shop-search" type="search" placeholder="Try cargos or boots" autocomplete="off"></label>
+            <label class="shop-search"><span>Search the catalog</span><input id="shop-search" type="search" placeholder="Try MOLOT, cargos or boots" autocomplete="off"></label>
           </div>
           <div class="category-filters" aria-label="Shop by category">
             <button type="button" data-category="style" aria-pressed="true">By style</button>
@@ -172,6 +181,22 @@
             <button type="button" data-category="Outerwear" aria-pressed="false">Outerwear</button>
             <button type="button" data-category="Footwear" aria-pressed="false">Footwear</button>
             <button type="button" data-category="Accessories" aria-pressed="false">Accessories</button>
+          </div>
+          <div class="catalog-refinements">
+            <label>Maker
+              <select id="catalog-maker"><option value="">All makers</option></select>
+            </label>
+            <label>Available size
+              <select id="catalog-size"><option value="">All sizes</option></select>
+            </label>
+            <label>Sort
+              <select id="catalog-sort">
+                <option value="">Featured</option>
+                <option value="price-up">Price: low to high</option>
+                <option value="price-down">Price: high to low</option>
+                <option value="name">Name: A–Z</option>
+              </select>
+            </label>
           </div>
           <section id="catalog-results" class="catalog-results" hidden aria-label="Matching products">
             <p id="catalog-summary" class="catalog-summary" role="status"></p>
@@ -543,7 +568,8 @@
           <h2 id="lore-title">Lore<span>.</span></h2>
           <p class="editorial-lead">Six looks from a city after dark.</p>
           <p>R2 is a pilot and a DJ whose face has never been seen. In the Show, the camera follows him and the rest of the cast through one night, as each pair brings a different FU7URE style onto the dance floor.</p>
-          <p class="release-note">More lore coming soon.</p>
+          <p>The night starts with R2 and Sasha, moves through Tsubasa and QU4NT’s technical layers, and closes with V3SP3R and L0WK3Y. Each set has its own maker and clothing style.</p>
+          <a class="editorial-link" href="#merchandise">Shop the six collections <span aria-hidden="true">↗</span></a>
         </div>
         <img src="media/fu7ure-city.webp" alt="Concept art of FU7URE’s futuristic city skyline" loading="lazy">
       </div>
@@ -554,8 +580,16 @@
         <h2 id="coming-soon-title">Coming soon<span>.</span></h2>
         <div>
           <p class="editorial-lead">The first FU7URE drop.</p>
-          <p>Apparel and accessories from the lookbook. The release date and final lineup will be announced before orders open.</p>
-          <a class="editorial-link" href="#merchandise">Browse the preview <span aria-hidden="true">↗</span></a>
+          <p>Apparel and accessories from the lookbook. Try the drop notification flow with a sample email.</p>
+          <form class="prototype-form" id="drop-waitlist" method="dialog" autocomplete="off">
+            <label for="drop-email">Email address</label>
+            <div class="waitlist-input">
+              <input id="drop-email" type="email" name="email" placeholder="sample@example.com" required>
+              <button class="prototype-primary" type="submit">Join demo waitlist</button>
+            </div>
+            <p class="prototype-note">Demo signups are stored as a status on this device.</p>
+            <p id="waitlist-status" class="prototype-status" role="status"></p>
+          </form>
         </div>
       </div>
     </section>
@@ -564,10 +598,41 @@
       <div class="editorial-inner">
         <h2 id="support-title">Customer care<span>.</span></h2>
         <div class="support-grid">
-          <article id="size-and-fit" tabindex="-1"><h3>Size &amp; fit</h3><p>Garment measurements and fit notes will be available for each piece in the first drop.</p></article>
-          <article id="shipping-and-returns" tabindex="-1"><h3>Shipping &amp; returns</h3><p>Delivery regions, rates and return instructions will be available before orders open.</p></article>
-          <article id="contact" tabindex="-1"><h3>Contact</h3><p>Order support details will be available when the shop opens.</p></article>
+          <article id="size-and-fit" tabindex="-1">
+            <h3>Size &amp; fit</h3>
+            <p>Use the Size guide next to the picker on each product. Compare your body measurements with the sample chart. Footwear uses EU sizing.</p>
+            <a class="editorial-link" href="#merchandise">Browse product size guides <span aria-hidden="true">↗</span></a>
+          </article>
+          <article id="shipping-and-returns" tabindex="-1">
+            <h3>Shipping &amp; returns</h3>
+            <p>Try sample standard or express delivery. Australia is A$12 standard or A$20 express. New Zealand is A$20 standard or A$32 express.</p>
+            <p>To test an exchange within the sample 30-day window, open your demo order history and use its reference in the support form.</p>
+            <button type="button" class="prototype-link" id="prototype-orders">View demo orders <span aria-hidden="true">↗</span></button>
+          </article>
+          <article id="contact" tabindex="-1">
+            <h3>Contact</h3>
+            <p>Use the demo support form for order, fit or exchange questions. Use sample details.</p>
+            <details class="support-request">
+              <summary>Open demo support form</summary>
+              <form class="prototype-form" id="demo-support" method="dialog" autocomplete="off">
+                <div class="prototype-field">
+                  <label for="support-topic">Topic</label>
+                  <select id="support-topic" name="topic" required>
+                    <option value="">Choose a topic</option>
+                    <option value="order">Order or tracking</option>
+                    <option value="exchange">Return or exchange</option>
+                    <option value="fit">Product or fit</option>
+                  </select>
+                </div>
+                <label>Demo order reference (optional) <input name="reference" maxlength="40"></label>
+                <label>Message <textarea name="message" rows="3" maxlength="500" required></textarea></label>
+                <button class="prototype-primary" type="submit">Create demo request</button>
+                <p id="support-status" class="prototype-status" role="status"></p>
+              </form>
+            </details>
+          </article>
         </div>
+        <p class="support-policy"><a class="editorial-link" href="preview-policy.html">Preview policy &amp; data <span aria-hidden="true">↗</span></a></p>
       </div>
     </section>
   </main>
@@ -591,6 +656,7 @@
         <h2 id="preview-name"></h2>
         <p class="preview-price"><data class="product-price" id="preview-price"></data><span>Sample price</span></p>
         <p id="preview-description"></p>
+        <dl class="product-specifications" id="preview-specifications" aria-label="Sample product specifications" hidden></dl>
         <form class="product-purchase" id="product-purchase" hidden>
           <div>
             <label for="preview-size">Size</label>
@@ -598,6 +664,7 @@
           </div>
           <button class="add-to-bag" type="submit">Add to Bag</button>
         </form>
+        <p class="preview-stock" id="preview-stock" role="status"></p>
         <a class="editorial-link" href="#coming-soon">First drop information <span aria-hidden="true">↗</span></a>
       </div>
     </div>
@@ -628,38 +695,86 @@
     <div class="bag-header">
       <h2 id="checkout-title">Demo checkout</h2>
       <form method="dialog" class="bag-close">
-        <button type="submit" aria-label="Close demo checkout">×</button>
+        <button type="submit" aria-label="Close checkout dialog">×</button>
       </form>
     </div>
-    <div class="checkout-content">
-      <p class="checkout-note">Use sample shipping details. This demo skips payment.</p>
+    <div class="checkout-content" id="checkout-content">
+      <p class="checkout-note" id="checkout-note">Use sample details. This demo simulates shipping and payment. The address and email are cleared when you finish or close checkout.</p>
+      <ol class="checkout-steps" id="checkout-steps" aria-label="Checkout progress">
+        <li aria-current="step">Delivery</li>
+        <li>Review</li>
+        <li>Complete</li>
+      </ol>
       <div class="checkout-layout">
-        <div>
+        <div class="checkout-details">
           <form id="shipping-form" method="dialog" autocomplete="off" class="shipping-form">
-            <h3>Shipping details</h3>
-            <label class="shipping-wide">Full name <input name="name" required></label>
-            <label class="shipping-wide">Street address <input name="street" required></label>
-            <label class="shipping-wide">Apartment or unit (optional) <input name="unit"></label>
-            <label>City or suburb <input name="city" required></label>
-            <label>State or region (optional) <input name="region"></label>
-            <label>Postcode <input name="postcode" required></label>
-            <label>Country <input name="country" required></label>
+            <div class="shipping-wide checkout-section-heading">
+              <h3 tabindex="-1" id="shipping-heading">Contact &amp; delivery</h3>
+              <button class="checkout-fill" type="button" id="fill-checkout-sample">Use sample details</button>
+            </div>
+            <label>Full name <input name="name" maxlength="100" pattern=".*\S.*" required></label>
+            <label>Email for receipt preview <input name="email" type="email" maxlength="160" required></label>
+            <label class="shipping-wide">Country
+              <select name="country">
+                <option value="AU">Australia</option>
+                <option value="NZ">New Zealand</option>
+              </select>
+            </label>
+            <label class="shipping-wide">Street address <input name="street" maxlength="120" pattern=".*\S.*" required></label>
+            <label class="shipping-wide">Apartment or unit (optional) <input name="unit" maxlength="60"></label>
+            <label>City or suburb <input name="city" maxlength="80" pattern=".*\S.*" required></label>
+            <label><span id="checkout-region-label">State or territory</span> <select name="region" required></select></label>
+            <div class="checkout-postcode">
+              <label>Postcode <input name="postcode" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" aria-describedby="checkout-postcode-note" required></label>
+              <p id="checkout-postcode-note" class="checkout-field-note">4 digits</p>
+            </div>
+            <fieldset class="shipping-wide checkout-methods">
+              <legend>Demo delivery</legend>
+              <label>
+                <input type="radio" name="delivery" value="standard" checked>
+                <span>Standard <small id="checkout-standard-window"></small></span>
+                <span id="checkout-standard-price"></span>
+              </label>
+              <label>
+                <input type="radio" name="delivery" value="express">
+                <span>Express <small id="checkout-express-window"></small></span>
+                <span id="checkout-express-price"></span>
+              </label>
+            </fieldset>
             <button class="checkout-primary shipping-wide" type="submit">Review order</button>
           </form>
           <section id="shipping-review" hidden>
-            <h3 tabindex="-1" id="review-heading">Review shipping</h3>
-            <p class="shipping-address" id="shipping-address"></p>
-            <div class="checkout-actions">
-              <button class="checkout-secondary" type="button" id="edit-shipping">Edit shipping</button>
-              <button class="checkout-primary" type="button" id="finish-checkout">Complete demo order</button>
+            <h3 tabindex="-1" id="review-heading">Review demo order</h3>
+            <div class="checkout-review-cards">
+              <section class="checkout-card">
+                <h4>Sample delivery</h4>
+                <p class="shipping-address" id="shipping-address"></p>
+                <p class="checkout-card-note" id="shipping-method"></p>
+              </section>
+              <section class="checkout-card">
+                <h4>Receipt preview</h4>
+                <p id="checkout-receipt-email"></p>
+                <p class="checkout-card-note">Preview only. No email is sent.</p>
+              </section>
+              <section class="checkout-card checkout-payment">
+                <h4>Simulated payment</h4>
+                <p class="checkout-card-note">No card details or charge.</p>
+              </section>
             </div>
           </section>
           <section id="checkout-complete" hidden>
             <h3 tabindex="-1" id="checkout-complete-title">Demo order complete</h3>
-            <p>Your test order was completed on this page.</p>
-            <form method="dialog">
-              <button class="checkout-primary" type="submit">Back to bag</button>
-            </form>
+            <div class="checkout-card checkout-confirmation">
+              <p>Order reference</p>
+              <strong id="checkout-reference"></strong>
+              <p id="checkout-confirmation-note" class="checkout-card-note"></p>
+            </div>
+            <div class="checkout-actions">
+              <button class="checkout-secondary" type="button" id="checkout-view-orders">View demo orders</button>
+              <form method="dialog">
+                <button class="checkout-primary" type="submit">Done</button>
+              </form>
+            </div>
           </section>
         </div>
         <section class="checkout-summary" aria-labelledby="checkout-summary-heading">
@@ -667,12 +782,31 @@
           <ul id="checkout-items" class="checkout-items"></ul>
           <dl class="checkout-totals">
             <div><dt>Subtotal</dt><dd id="checkout-subtotal">A$0</dd></div>
-            <div><dt>Demo shipping</dt><dd>A$0</dd></div>
-            <div class="checkout-grand-total"><dt>Total</dt><dd id="checkout-total">A$0</dd></div>
+            <div><dt>Demo shipping</dt><dd id="checkout-shipping">A$0</dd></div>
+            <div><dt>Demo tax</dt><dd>A$0</dd></div>
+            <div class="checkout-grand-total"><dt>Demo total <small>(AUD)</small></dt><dd><output id="checkout-total" aria-live="polite">A$0</output></dd></div>
           </dl>
         </section>
       </div>
+      <div class="checkout-review-actions" id="checkout-review-actions" hidden>
+        <p class="checkout-feedback" id="checkout-feedback" role="status"></p>
+        <div class="checkout-actions">
+          <button class="checkout-secondary" type="button" id="edit-shipping">Edit delivery</button>
+          <button class="checkout-primary" type="button" id="finish-checkout">Place demo order</button>
+        </div>
+      </div>
     </div>
+    <section class="checkout-content checkout-orders" id="checkout-orders" aria-labelledby="checkout-orders-title" hidden>
+      <h3 tabindex="-1" id="checkout-orders-title">Order history</h3>
+      <p class="checkout-note" id="checkout-order-history-note">Recent demo orders from this browser.</p>
+      <p id="checkout-orders-empty">Completed demo orders will appear here.</p>
+      <ul class="checkout-orders-list" id="checkout-orders-list"></ul>
+    </section>
+    <section class="checkout-content" id="checkout-empty-cart" hidden>
+      <h3 tabindex="-1" id="checkout-empty-title">Your bag is empty</h3>
+      <p class="checkout-note">Add an item to the bag to start a demo order.</p>
+      <form method="dialog"><button class="checkout-primary" type="submit">Close checkout</button></form>
+    </section>
   </dialog>
 
   <template id="bag-item-template">

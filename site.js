@@ -35,6 +35,8 @@
   const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
   const smallViewport = matchMedia("(max-height: 470px), (max-width: 760px) and (max-height: 560px)");
   const config = window.fu7ureVideos || {};
+  const rearCut = 0.40;
+  const closingCut = 0.80;
 
   const sceneDesigns = {
     "r2-sasha": {
@@ -67,6 +69,7 @@
       reveal,
       videoPath: config[article.id],
       video: null,
+      decodedProgress: null,
     };
   });
   const last = scenes.length - 1;
@@ -101,6 +104,7 @@
   function selectScene(index) {
     const scene = scenes[index];
     currentScene = index;
+    scene.decodedProgress = null;
     front.src = scene.opening.getAttribute("src");
     rear.src = scene.reveal.getAttribute("src");
     title.textContent = scene.title;
@@ -130,7 +134,7 @@
     video.preload = "auto";
     video.tabIndex = -1;
     scene.video = video;
-    for (const event of ["loadedmetadata", "loadeddata", "progress", "seeked", "error"]) {
+    for (const event of ["loadedmetadata", "loadeddata", "canplay", "progress", "seeked", "error"]) {
       video.addEventListener(event, schedule);
     }
     video.src = scene.videoPath;
@@ -138,25 +142,48 @@
   }
 
   function seekVideos(index, progress) {
-    let filmReady = false;
-    scenes.forEach(({ video }, videoIndex) => {
+    let displayedProgress = null;
+    scenes.forEach((scene, videoIndex) => {
+      const { video } = scene;
       if (!video) return;
       let visible = false;
-      if (index === videoIndex && !video.error && Number.isFinite(video.duration) && video.seekable.length && video.seekable.end(video.seekable.length - 1) > 0) {
-        const target = progress * Math.max(0, video.duration - 1 / 30);
-        if (!video.seeking && Math.abs(video.currentTime - target) > 1 / 35) {
-          video.currentTime = target;
+      if (index === videoIndex && !video.error && Number.isFinite(video.duration) && video.seekable.length) {
+        const lastTime = Math.max(0, video.duration - 1 / 30);
+        const target = progress * lastTime;
+        if (!video.seeking) {
+          if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA && lastTime > 0) {
+            scene.decodedProgress = clamp(video.currentTime / lastTime);
+          }
+          if (Math.abs(video.currentTime - target) > 1 / 48) video.currentTime = target;
         }
-        if (video.readyState >= 2) video.dataset.decoded = "true";
-        visible = video.dataset.decoded === "true";
+        if (scene.decodedProgress !== null && Math.abs(scene.decodedProgress - progress) < .09) {
+          visible = true;
+          displayedProgress = scene.decodedProgress;
+        }
       }
       video.style.opacity = visible ? "1" : "0";
-      filmReady = filmReady || visible;
     });
-    return filmReady;
+    return displayedProgress;
   }
 
-  function followCast(design, rearAmount, finishAmount, frontScale) {
+  function filmFraming(progress, isClosingChapter) {
+    const opening = progress < rearCut;
+    const closing = isClosingChapter && progress >= closingCut;
+    if (closing) {
+      const phase = (progress - closingCut) / (1 - closingCut);
+      return { rear: 1, finish: 1, scale: 1 + .026 * (1 - ease(phase / .60)), pan: 0 };
+    }
+    const end = isClosingChapter ? closingCut : 1;
+    const phase = opening ? progress / rearCut : (progress - rearCut) / (end - rearCut);
+    return {
+      rear: Number(!opening),
+      finish: 0,
+      scale: 1.042 + .041 * Math.sin(Math.PI * (.12 + .77 * phase)),
+      pan: (.025 - .050 * ease(phase)) * (opening ? ease(phase / .27) : 1),
+    };
+  }
+
+  function followCast(design, { rear, finish, scale, pan }) {
     const stageBox = stage.getBoundingClientRect();
     const imageBox = imageStage.getBoundingClientRect();
     const cover = getComputedStyle(front).objectFit === "cover";
@@ -172,12 +199,11 @@
     const offsets = design.front.map(([frontX, frontY], index) => {
       const [rearX, rearY] = design.rear[index];
       const [finishX, finishY] = design.finish?.[index] || design.front[index];
-      const u = lerp(lerp(frontX, rearX, rearAmount), finishX, finishAmount);
-      const v = lerp(lerp(frontY, rearY, rearAmount), finishY, finishAmount);
-      const nudge = lerp(frontScale, 1, Math.max(rearAmount, finishAmount));
+      const u = lerp(lerp(frontX, rearX, rear), finishX, finish);
+      const v = lerp(lerp(frontY, rearY, rear), finishY, finish);
       return {
-        x: within(imageBox.left - stageBox.left + imageBox.width / 2 + (u - .5) * width * nudge, margin, stageBox.width - margin),
-        y: within(imageBox.top - stageBox.top + imageBox.height / 2 + (v - .5) * height * nudge, margin, limitY),
+        x: within(imageBox.left - stageBox.left + imageBox.width / 2 + ((u - .5) * scale + pan) * width, margin, stageBox.width - margin),
+        y: within(imageBox.top - stageBox.top + imageBox.height / 2 + (v - .5) * height * scale, margin, limitY),
         control: styleControls[index],
       };
     }).sort((a, b) => a.x - b.x);
@@ -227,7 +253,6 @@
 
     const rearAmount = ease((progress - 0.19) / 0.34);
     const finishAmount = index === last ? ease((progress - 0.72) / 0.20) : 0;
-    const visibleFrame = finishAmount >= 0.5 ? "CLOSING VIEW" : rearAmount >= 0.5 ? "REAR ANGLE" : "FRONT VIEW";
     const frontScale = 1 + 0.025 * ease(progress / 0.6);
     front.style.setProperty("--scale", String(frontScale));
     rear.style.opacity = String(rearAmount);
@@ -237,31 +262,42 @@
     closingMessage.style.opacity = String(wordmarkOpacity);
     stage.toggleAttribute("data-closing", wordmarkOpacity > 0);
 
-    const filmReady = seekVideos(index, progress);
+    const filmProgress = seekVideos(index, progress);
+    const filmReady = filmProgress !== null;
+    if (index < last && progress >= .28) ensureVideo(scenes[index + 1]);
+
     let offset = 101;
-    if (!filmReady && index > 0 && progress < 0.15) {
+    if (index > 0 && progress < 0.15) {
       offset = -101 * ease(progress / 0.15);
-    } else if (!filmReady && index < last && progress > 0.85) {
+    } else if (index < last && progress > 0.85) {
       offset = 101 * (1 - ease((progress - 0.85) / 0.15));
     }
     pillar.style.transform = "translateX(" + offset + "%)";
-    followCast(scene.design, rearAmount, finishAmount, frontScale);
-    const wipeOpacity = offset <= 0 ? Math.abs(offset) / 101 : offset / 101;
-    const labelOpacity = Math.max(0.18, wipeOpacity);
-    const flipOpacity = filmReady ? 1 : Math.max(0.42, Math.abs(rearAmount - 0.5) * 2);
-    const closingOpacity = filmReady || index !== last ? 1 : Math.max(0.42, Math.abs(finishAmount - 0.5) * 2);
-    callouts.style.setProperty("--callout-opacity", String(Math.min(labelOpacity, flipOpacity, closingOpacity)));
+    const framing = filmReady ? filmFraming(filmProgress, index === last) : {
+      rear: rearAmount,
+      finish: finishAmount,
+      scale: 1 + (frontScale - 1) * (1 - Math.max(rearAmount, finishAmount)),
+      pan: 0,
+    };
+    followCast(scene.design, framing);
+    const wipeOpacity = Math.abs(offset) / 101;
+    const flipOpacity = filmReady ? ease(Math.abs(filmProgress - rearCut) / .075) :
+      Math.max(0.42, Math.abs(rearAmount - 0.5) * 2);
+    const closingOpacity = index !== last ? 1 : filmReady ? ease(Math.abs(filmProgress - closingCut) / .05) :
+      Math.max(0.42, Math.abs(finishAmount - 0.5) * 2);
+    callouts.style.setProperty("--callout-opacity", String(Math.min(wipeOpacity, flipOpacity, closingOpacity)));
 
-    const art = visibleFrame === "CLOSING VIEW" ? finish : visibleFrame === "REAR ANGLE" ? scene.reveal : scene.opening;
+    const closingView = framing.finish >= .5;
+    const rearView = framing.rear >= .5;
+    const art = closingView ? finish : rearView ? scene.reveal : scene.opening;
     const artworkSource = art.getAttribute("src");
     if (artworkSource !== backdrop) {
       backdrop = artworkSource;
       stage.style.setProperty("--scene-image", 'url("' + backdrop + '")');
     }
     tracker.style.transform = "scaleX(" + track + ")";
-    viewLabel.textContent = filmReady ? "DANCE FILM" : visibleFrame;
-    front.alt = finishAmount >= 0.5 ? finish.dataset.description :
-      rearAmount >= 0.5 ? scene.reveal.alt : scene.opening.alt;
+    viewLabel.textContent = closingView ? "CLOSING VIEW" : rearView ? "REAR ANGLE" : "FRONT VIEW";
+    front.alt = closingView ? finish.dataset.description : art.alt;
     orbitLabel.textContent = progress < 0.54 ? "Scroll to explore" :
       index < last ? "Next styles" : progress < 0.94 ? "Closing view" : "Back to start";
   }

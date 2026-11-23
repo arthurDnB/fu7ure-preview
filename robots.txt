@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://arthurdnb.github.io/fu7ure-preview/sitemap.xml

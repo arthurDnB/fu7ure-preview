@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101211">
+  <title>Product · FU7URE</title>
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="product-angles.js"></script>
+  <script defer src="shop.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#product-page">Skip to the product</a>
+  <header class="masthead">
+    <div class="masthead-inner">
+      <a class="logo" href="./" aria-label="FU7URE home">FU<span>7</span>URE</a>
+      <nav class="store-nav" aria-label="Main navigation">
+        <a href="./#merchandise" aria-current="location">Shop</a>
+        <a href="./#show">Show</a>
+        <a href="./#lore">Lore</a>
+        <a href="./#about">About</a>
+        <a href="./#coming-soon">Coming soon</a>
+      </nav>
+      <div class="header-actions">
+        <button class="bag-toggle" type="button" id="bag-toggle" aria-haspopup="dialog" hidden>
+          Bag <span id="bag-count">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+  <main class="product-page" id="product-page" tabindex="-1">
+    <a class="product-back" id="product-back" href="./#merchandise"><span aria-hidden="true">←</span> <span id="product-back-label">Shop</span></a>
+    <p id="product-message" role="status">Loading product…</p>
+    <noscript><p>Enable JavaScript to view product details and use the bag.</p></noscript>
+    <article class="product-sheet" id="product-sheet" hidden></article>
+  </main>
+</body>
+</html>

@@ -616,10 +616,62 @@
     </div>
     <div class="bag-footer">
       <p class="bag-total"><span>Total</span> <output id="bag-total" aria-label="Bag total" aria-live="polite">A$0</output></p>
-      <p class="bag-note">Sample prices in AUD. Orders open at launch.</p>
+      <p class="bag-note">Sample prices in AUD.</p>
+      <button class="bag-continue" type="button" id="bag-checkout" disabled>Demo checkout</button>
       <form method="dialog">
         <button class="bag-continue" type="submit">Continue shopping</button>
       </form>
+    </div>
+  </dialog>
+
+  <dialog class="checkout-dialog" id="demo-checkout" aria-labelledby="checkout-title">
+    <div class="bag-header">
+      <h2 id="checkout-title">Demo checkout</h2>
+      <form method="dialog" class="bag-close">
+        <button type="submit" aria-label="Close demo checkout">×</button>
+      </form>
+    </div>
+    <div class="checkout-content">
+      <p class="checkout-note">Use sample shipping details. This demo skips payment.</p>
+      <div class="checkout-layout">
+        <div>
+          <form id="shipping-form" method="dialog" autocomplete="off" class="shipping-form">
+            <h3>Shipping details</h3>
+            <label class="shipping-wide">Full name <input name="name" required></label>
+            <label class="shipping-wide">Street address <input name="street" required></label>
+            <label class="shipping-wide">Apartment or unit (optional) <input name="unit"></label>
+            <label>City or suburb <input name="city" required></label>
+            <label>State or region (optional) <input name="region"></label>
+            <label>Postcode <input name="postcode" required></label>
+            <label>Country <input name="country" required></label>
+            <button class="checkout-primary shipping-wide" type="submit">Review order</button>
+          </form>
+          <section id="shipping-review" hidden>
+            <h3 tabindex="-1" id="review-heading">Review shipping</h3>
+            <p class="shipping-address" id="shipping-address"></p>
+            <div class="checkout-actions">
+              <button class="checkout-secondary" type="button" id="edit-shipping">Edit shipping</button>
+              <button class="checkout-primary" type="button" id="finish-checkout">Complete demo order</button>
+            </div>
+          </section>
+          <section id="checkout-complete" hidden>
+            <h3 tabindex="-1" id="checkout-complete-title">Demo order complete</h3>
+            <p>Your test order was completed on this page.</p>
+            <form method="dialog">
+              <button class="checkout-primary" type="submit">Back to bag</button>
+            </form>
+          </section>
+        </div>
+        <section class="checkout-summary" aria-labelledby="checkout-summary-heading">
+          <h3 id="checkout-summary-heading">Order summary</h3>
+          <ul id="checkout-items" class="checkout-items"></ul>
+          <dl class="checkout-totals">
+            <div><dt>Subtotal</dt><dd id="checkout-subtotal">A$0</dd></div>
+            <div><dt>Demo shipping</dt><dd>A$0</dd></div>
+            <div class="checkout-grand-total"><dt>Total</dt><dd id="checkout-total">A$0</dd></div>
+          </dl>
+        </section>
+      </div>
     </div>
   </dialog>
 
@@ -627,7 +679,7 @@
     <li class="bag-item">
       <img class="bag-item-image" alt="" width="64" height="64">
       <div class="bag-item-info">
-        <p class="bag-item-name"></p>
+        <a class="bag-item-name"></a>
         <p class="bag-item-size"></p>
         <div class="bag-item-actions">
           <div class="bag-quantity" role="group">

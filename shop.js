@@ -1,9 +1,33 @@
-(() => {
+(async () => {
   "use strict";
 
   const byId = (id) => document.getElementById(id);
+  const productPage = byId("product-page");
+  let catalog = document;
+  if (productPage) {
+    try {
+      const response = await fetch("index.html");
+      if (!response.ok) throw new Error("Catalog unavailable");
+      const template = document.createElement("template");
+      template.innerHTML = await response.text();
+      catalog = template.content;
+      const details = catalog.querySelector("#product-preview .preview-content");
+      const title = document.createElement("h1");
+      title.id = "preview-name";
+      details.querySelector("#preview-name").replaceWith(title);
+      details.querySelector(".editorial-link").href = "./#coming-soon";
+      byId("product-sheet").append(details);
+      for (const id of ["shopping-bag", "demo-checkout", "bag-item-template"]) {
+        document.body.append(catalog.querySelector("#" + id));
+      }
+    } catch {
+      byId("product-message").textContent = "The product catalog is unavailable. Return to the shop to try again.";
+      return;
+    }
+  }
+
   const browse = byId("shop-browse");
-  const styles = byId("style-catalog");
+  const styles = catalog.querySelector("#style-catalog");
   const results = byId("catalog-results");
   const productList = byId("filtered-products");
   const summary = byId("catalog-summary");
@@ -16,11 +40,16 @@
   const bagToggle = byId("bag-toggle");
   const bagItems = byId("bag-items");
   const bagTemplate = byId("bag-item-template");
+  const checkoutDialog = byId("demo-checkout");
+  const checkoutButton = byId("bag-checkout");
+  const shippingForm = byId("shipping-form");
+  const shippingReview = byId("shipping-review");
+  const checkoutComplete = byId("checkout-complete");
   const bagKey = "fu7ure-preview:bag";
   const supportsBag = typeof bagDialog.showModal === "function";
   const numberFormat = new Intl.NumberFormat("en-AU");
-  const categoryButtons = [...browse.querySelectorAll("[data-category]")];
-  const audienceInputs = [...browse.querySelectorAll("[name=shop-look]")];
+  const categoryButtons = browse ? [...browse.querySelectorAll("[data-category]")] : [];
+  const audienceInputs = browse ? [...browse.querySelectorAll("[name=shop-look]")] : [];
   const mainLinks = [...document.querySelectorAll(".store-nav a")];
   const ownCategories = new Set(["Tops", "Bottoms", "Outerwear", "Footwear"]);
   const angleSources = window.fu7ureProductAngles || {};
@@ -71,6 +100,7 @@
       index, card, template: card.cloneNode(true), name, type, style, key, price,
       sizes: sizesByProduct[key] || sizesByType[type] || ["One size"],
       audience: collection.dataset.look,
+      collection: collection.id,
       category: ownCategories.has(type) ? type : "Accessories",
       frames: [{ src, label: "Main view" }, ...(angleSources[key] || [])],
       alt: image.alt,
@@ -78,6 +108,7 @@
   });
 
   const productsByKey = new Map(products.map((product) => [product.key, product]));
+  const productUrl = (product) => "product.html?item=" + encodeURIComponent(product.key);
   const bagLineKey = (key, size) => key + ":" + size;
   const money = (amount) => "A$" + numberFormat.format(amount);
   let bag = loadBag();
@@ -121,28 +152,29 @@
       style.textContent = product.style;
       caption.append(style);
     }
-    if (typeof dialog.showModal === "function") {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "product-open";
-      button.dataset.preview = String(product.index);
-      button.textContent = "View details";
-      button.setAttribute("aria-label", "View details for " + product.name);
-      const actions = document.createElement("div");
-      actions.className = "product-actions";
-      actions.append(button);
-      if (supportsBag) {
-        const add = document.createElement("button");
-        add.type = "button";
-        add.className = "product-add";
-        add.dataset.preview = String(product.index);
-        add.dataset.chooseSize = "";
-        add.textContent = "Add to Bag";
-        add.setAttribute("aria-label", "Add " + product.name + " to bag");
-        actions.append(add);
-      }
-      caption.append(actions);
+    const title = document.createElement("a");
+    title.href = productUrl(product);
+    title.textContent = product.name;
+    caption.querySelector("h4, h5").replaceChildren(title);
+
+    const details = document.createElement("a");
+    details.className = "product-open";
+    details.href = title.href;
+    details.textContent = "View details";
+    details.setAttribute("aria-label", "View details for " + product.name);
+    const actions = document.createElement("div");
+    actions.className = "product-actions";
+    actions.append(details);
+    if (supportsBag && typeof dialog?.showModal === "function") {
+      const add = document.createElement("button");
+      add.type = "button";
+      add.className = "product-add";
+      add.dataset.preview = String(product.index);
+      add.textContent = "Add to Bag";
+      add.setAttribute("aria-label", "Add " + product.name + " to bag");
+      actions.append(add);
     }
+    caption.append(actions);
     return card;
   }
 
@@ -206,7 +238,7 @@
     renderCatalog();
   }
 
-  function openPreview(product, chooseSize) {
+  function showProduct(product) {
     previewProduct = product;
     if (supportsBag) {
       const sizes = product.sizes.map((size) => new Option(size, size));
@@ -227,8 +259,30 @@
     const text = byId("preview-description");
     text.textContent = descriptions[product.key] || "";
     text.hidden = !text.textContent;
+  }
+
+  function openPreview(product) {
+    showProduct(product);
     dialog.showModal();
-    if (chooseSize) sizeSelect.focus();
+    sizeSelect.focus();
+  }
+
+  function renderProductPage() {
+    const key = new URLSearchParams(location.search).get("item");
+    const product = productsByKey.get(key);
+    const message = byId("product-message");
+    if (!product) {
+      document.title = "Product not found · FU7URE";
+      message.textContent = "This product could not be found. Browse the shop to find another piece.";
+      return;
+    }
+
+    document.title = product.name + " · FU7URE";
+    byId("product-back").href = "./#" + product.collection;
+    byId("product-back-label").textContent = product.style;
+    showProduct(product);
+    byId("product-sheet").hidden = false;
+    message.hidden = true;
   }
 
   function loadBag() {
@@ -261,6 +315,7 @@
     let count = 0;
     let total = 0;
     const rows = [];
+    const summaryRows = [];
     for (const [id, { key, size, quantity }] of bag) {
       const product = productsByKey.get(key);
       const subtotal = Number(product.price.value) * quantity;
@@ -270,8 +325,11 @@
       const row = bagTemplate.content.firstElementChild.cloneNode(true);
       row.dataset.bagLine = id;
       row.querySelector("img").src = product.frames[0].src;
-      row.querySelector(".bag-item-name").textContent = product.name;
-      row.querySelector(".bag-item-size").textContent = size === "One size" ? size : "Size " + size;
+      const name = row.querySelector(".bag-item-name");
+      name.textContent = product.name;
+      name.href = productUrl(product);
+      const sizeLabel = size === "One size" ? size : "Size " + size;
+      row.querySelector(".bag-item-size").textContent = sizeLabel;
       row.querySelector(".bag-item-count").textContent = quantity;
       row.querySelector(".bag-line-total").textContent = money(subtotal);
 
@@ -283,12 +341,25 @@
       row.querySelector("[data-bag-action=increase]").setAttribute("aria-label", "Increase quantity of " + label);
       row.querySelector("[data-bag-action=remove]").setAttribute("aria-label", "Remove " + label);
       rows.push(row);
+
+      const summaryLine = document.createElement("li");
+      const details = document.createElement("span");
+      details.textContent = product.name + " · " + sizeLabel + " × " + quantity;
+      const amount = document.createElement("span");
+      amount.textContent = money(subtotal);
+      summaryLine.append(details, amount);
+      summaryRows.push(summaryLine);
     }
 
     bagItems.replaceChildren(...rows);
     byId("bag-empty").hidden = count > 0;
     byId("bag-count").textContent = count;
     byId("bag-total").value = money(total);
+    byId("checkout-items").replaceChildren(...summaryRows);
+    byId("checkout-subtotal").textContent = money(total);
+    byId("checkout-total").textContent = money(total);
+    checkoutButton.disabled = count === 0;
+    if (!count && checkoutDialog.open && checkoutComplete.hidden) checkoutDialog.close();
   }
 
   function changeQuantity(event) {
@@ -320,6 +391,7 @@
     purchaseForm.hidden = false;
     bagToggle.hidden = false;
     bagToggle.addEventListener("click", () => bagDialog.showModal());
+    initCheckout();
     purchaseForm.addEventListener("submit", (event) => {
       event.preventDefault();
       const size = sizeSelect.value;
@@ -330,7 +402,7 @@
       if (!Number.isSafeInteger(quantity)) return;
       bag.set(id, { key, size, quantity });
       saveBag();
-      dialog.close();
+      if (dialog?.open) dialog.close();
       bagDialog.showModal();
     });
     bagItems.addEventListener("click", changeQuantity);
@@ -338,6 +410,45 @@
       if (event.key !== bagKey && event.key !== null) return;
       bag = loadBag();
       renderBag();
+    });
+  }
+
+  function initCheckout() {
+    checkoutButton.addEventListener("click", () => {
+      if (bag.size) checkoutDialog.showModal();
+    });
+    shippingForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (!bag.size) return;
+      const data = new FormData(shippingForm);
+      const field = (name) => data.get(name).trim();
+      const locality = [field("city"), field("region"), field("postcode")].filter(Boolean).join(" ");
+      byId("shipping-address").textContent = [
+        field("name"), field("street"), field("unit"), locality, field("country"),
+      ].filter(Boolean).join("\n");
+      shippingForm.hidden = true;
+      shippingReview.hidden = false;
+      byId("review-heading").focus();
+    });
+    byId("edit-shipping").addEventListener("click", () => {
+      shippingReview.hidden = true;
+      shippingForm.hidden = false;
+      shippingForm.elements.namedItem("name").focus();
+    });
+    byId("finish-checkout").addEventListener("click", () => {
+      if (!bag.size) return;
+      shippingReview.hidden = true;
+      checkoutComplete.hidden = false;
+      shippingForm.reset();
+      byId("shipping-address").textContent = "";
+      byId("checkout-complete-title").focus();
+    });
+    checkoutDialog.addEventListener("close", () => {
+      shippingForm.reset();
+      shippingForm.hidden = false;
+      shippingReview.hidden = true;
+      checkoutComplete.hidden = true;
+      byId("shipping-address").textContent = "";
     });
   }
 
@@ -360,15 +471,21 @@
     });
   }
 
-  products.forEach((item) => enhanceCard(item.card, item, false));
   if (supportsBag) initBag();
-  browse.hidden = false;
-  browse.addEventListener("change", updateFilteredView);
-  search.addEventListener("input", updateFilteredView);
+  if (productPage) {
+    renderProductPage();
+  } else {
+    products.forEach((item) => enhanceCard(item.card, item, false));
+    browse.hidden = false;
+    browse.addEventListener("change", updateFilteredView);
+    search.addEventListener("input", updateFilteredView);
+    addEventListener("hashchange", updateNavigation);
+    updateNavigation();
+  }
 
   document.addEventListener("click", (event) => {
     const anchor = event.target.closest("a[href^='#']");
-    if (anchor) {
+    if (anchor && !productPage) {
       if (styles.hidden && styleAnchor(anchor.getAttribute("href"))) shopByStyle();
       if (dialog.open && dialog.contains(anchor)) dialog.close();
     }
@@ -384,7 +501,7 @@
       shopByStyle();
       search.focus();
     } else if (button.dataset.preview !== undefined) {
-      openPreview(products[Number(button.dataset.preview)], button.hasAttribute("data-choose-size"));
+      openPreview(products[Number(button.dataset.preview)]);
     } else if (button.dataset.angleStep) {
       const gallery = button.closest(".product-gallery");
       const product = products[Number(gallery.dataset.product)];
@@ -421,6 +538,4 @@
     delete gallery.dataset.zoom;
   }, { passive: true });
 
-  addEventListener("hashchange", updateNavigation);
-  updateNavigation();
 })();

@@ -275,6 +275,19 @@
   }
 
   function renderProductPhotos(product, gallery) {
+    const openPhoto = window.createProductPhotoViewer?.(product);
+    if (openPhoto) {
+      const mainImage = gallery.querySelector("img");
+      const trigger = document.createElement("button");
+      trigger.type = "button";
+      trigger.className = "photo-open photo-open-main";
+      trigger.setAttribute("aria-label", "Open selected photo full screen");
+      trigger.setAttribute("aria-haspopup", "dialog");
+      mainImage.before(trigger);
+      trigger.append(mainImage);
+      trigger.addEventListener("click", () => openPhoto(Number(gallery.dataset.frame), trigger));
+    }
+
     const thumbnails = document.createElement("div");
     thumbnails.className = "photo-thumbnails";
     thumbnails.setAttribute("role", "group");
@@ -304,15 +317,20 @@
       }
 
       const figure = document.createElement("figure");
-      const link = document.createElement("a");
-      link.href = frame.src;
-      link.target = "_blank";
-      link.rel = "noopener";
-      link.setAttribute("aria-label", "Open full-size photo: " + frame.label + " (new tab)");
-      link.append(image);
+      const trigger = document.createElement(openPhoto ? "button" : "a");
+      trigger.className = "photo-open";
+      trigger.setAttribute("aria-label", "Open " + frame.label.toLowerCase() + " full screen");
+      if (openPhoto) {
+        trigger.type = "button";
+        trigger.setAttribute("aria-haspopup", "dialog");
+        trigger.addEventListener("click", () => openPhoto(index, trigger));
+      } else {
+        trigger.href = frame.src;
+      }
+      trigger.append(image);
       const caption = document.createElement("figcaption");
       caption.textContent = frame.label;
-      figure.append(link, caption);
+      figure.append(trigger, caption);
       return figure;
     });
 

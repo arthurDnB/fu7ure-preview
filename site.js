@@ -37,11 +37,13 @@
   const config = window.fu7ureVideos || {};
   const rearCut = 0.40;
   const closingCut = 0.80;
+  const standingStop = 0.87;
 
   const sceneDesigns = {
     "r2-sasha": {
       brands: [{ name: "R2", logo: "r2-pin-stack-r1.svg" }, { name: "MOLOT", logo: "molot-coupler-r1.svg" }],
-      front: [[.365, .39], [.62, .405]], rear: [[.64, .41], [.34, .40]],
+      front: [[.365, .39], [.63, .365]], rear: [[.64, .41], [.34, .35]],
+      finish: [[.587, .395], [.753, .344]],
     },
     "tsubasa-qu4nt": {
       brands: [{ name: "H4J1ME", logo: "h4j1me-pole-position-r1.svg" }, { name: "8888", logo: "8888-faction-01-wordmark.svg" }],
@@ -67,6 +69,7 @@
       })),
       opening,
       reveal,
+      standing: article.querySelector("[data-standing] img"),
       videoPath: config[article.id],
       video: null,
       decodedProgress: null,
@@ -107,6 +110,7 @@
     scene.decodedProgress = null;
     front.src = scene.opening.getAttribute("src");
     rear.src = scene.reveal.getAttribute("src");
+    if (scene.standing) finish.src = scene.standing.getAttribute("src");
     title.textContent = scene.title;
     styleControls.forEach(({ element, link, label, logo }, styleIndex) => {
       const style = scene.styles[styleIndex];
@@ -166,14 +170,14 @@
     return displayedProgress;
   }
 
-  function filmFraming(progress, isClosingChapter) {
+  function filmFraming(progress, hasStandingView) {
     const opening = progress < rearCut;
-    const closing = isClosingChapter && progress >= closingCut;
+    const closing = hasStandingView && progress >= closingCut;
     if (closing) {
       const phase = (progress - closingCut) / (1 - closingCut);
       return { rear: 1, finish: 1, scale: 1 + .026 * (1 - ease(phase / .60)), pan: 0 };
     }
-    const end = isClosingChapter ? closingCut : 1;
+    const end = hasStandingView ? closingCut : 1;
     const phase = opening ? progress / rearCut : (progress - rearCut) / (end - rearCut);
     return {
       rear: Number(!opening),
@@ -252,12 +256,12 @@
     currentProgress = progress;
 
     const rearAmount = ease((progress - 0.19) / 0.34);
-    const finishAmount = index === last ? ease((progress - 0.72) / 0.20) : 0;
+    const finishAmount = scene.standing ? ease((progress - 0.72) / 0.20) : 0;
     const frontScale = 1 + 0.025 * ease(progress / 0.6);
     front.style.setProperty("--scale", String(frontScale));
     rear.style.opacity = String(rearAmount);
     finish.style.opacity = String(finishAmount);
-    const wordmarkOpacity = ease((finishAmount - 0.55) / 0.4);
+    const wordmarkOpacity = index === last ? ease((finishAmount - 0.55) / 0.4) : 0;
     closingMessage.hidden = wordmarkOpacity === 0;
     closingMessage.style.opacity = String(wordmarkOpacity);
     stage.toggleAttribute("data-closing", wordmarkOpacity > 0);
@@ -273,7 +277,7 @@
       offset = 101 * (1 - ease((progress - 0.85) / 0.15));
     }
     pillar.style.transform = "translateX(" + offset + "%)";
-    const framing = filmReady ? filmFraming(filmProgress, index === last) : {
+    const framing = filmReady ? filmFraming(filmProgress, Boolean(scene.standing)) : {
       rear: rearAmount,
       finish: finishAmount,
       scale: 1 + (frontScale - 1) * (1 - Math.max(rearAmount, finishAmount)),
@@ -283,22 +287,23 @@
     const wipeOpacity = Math.abs(offset) / 101;
     const flipOpacity = filmReady ? ease(Math.abs(filmProgress - rearCut) / .075) :
       Math.max(0.42, Math.abs(rearAmount - 0.5) * 2);
-    const closingOpacity = index !== last ? 1 : filmReady ? ease(Math.abs(filmProgress - closingCut) / .05) :
+    const closingOpacity = !scene.standing ? 1 : filmReady ? ease(Math.abs(filmProgress - closingCut) / .05) :
       Math.max(0.42, Math.abs(finishAmount - 0.5) * 2);
     callouts.style.setProperty("--callout-opacity", String(Math.min(wipeOpacity, flipOpacity, closingOpacity)));
 
     const closingView = framing.finish >= .5;
     const rearView = framing.rear >= .5;
-    const art = closingView ? finish : rearView ? scene.reveal : scene.opening;
+    const art = closingView ? scene.standing : rearView ? scene.reveal : scene.opening;
     const artworkSource = art.getAttribute("src");
     if (artworkSource !== backdrop) {
       backdrop = artworkSource;
       stage.style.setProperty("--scene-image", 'url("' + backdrop + '")');
     }
     tracker.style.transform = "scaleX(" + track + ")";
-    viewLabel.textContent = closingView ? "CLOSING VIEW" : rearView ? "REAR ANGLE" : "FRONT VIEW";
-    front.alt = closingView ? finish.dataset.description : art.alt;
+    viewLabel.textContent = closingView ? (index === last ? "CLOSING VIEW" : "STANDING VIEW") : rearView ? "REAR ANGLE" : "FRONT VIEW";
+    front.alt = art.alt;
     orbitLabel.textContent = progress < 0.54 ? "Scroll to explore" :
+      scene.standing && index < last && progress < .82 ? "Standing view" :
       index < last ? "Next styles" : progress < 0.94 ? "Closing view" : "Back to start";
   }
 
@@ -373,6 +378,7 @@
   jumps.forEach((button, index) => button.addEventListener("click", () => jumpTo(index, index ? 0.17 : 0)));
   orbitButton.addEventListener("click", () => {
     if (currentProgress < 0.54) jumpTo(currentScene, 0.58);
+    else if (scenes[currentScene].standing && currentScene < last && currentProgress < .82) jumpTo(currentScene, standingStop);
     else if (currentScene < last) jumpTo(currentScene + 1, 0.17);
     else if (currentProgress < 0.94) jumpTo(last, 1);
     else jumpTo(0);
@@ -392,7 +398,7 @@
   // Start from nearby frames so a fast scroll never has to fetch the next chapter from scratch.
   addEventListener("load", () => {
     for (const scene of scenes) {
-      for (const ref of [scene.opening, scene.reveal]) {
+      for (const ref of [scene.opening, scene.reveal, scene.standing].filter(Boolean)) {
         const image = new Image();
         image.src = ref.getAttribute("src");
       }

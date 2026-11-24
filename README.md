@@ -17,4 +17,4 @@ One sticky full-screen stage plays three live-action clips, one per duet, scrubb
 - Clips 02 and 03 live in `media/show/`. Their start and end frames (`media/*-v3-*.webp`) are the stills under the video and in the still version.
 - Timing, label windows and the dancers' chest positions are in `sceneDesigns` in `site.js`. If a clip is replaced, re-read the positions from the new footage.
 - Scroll per duet is `--step` in `styles.css`. Try other values on a preview with `?step=70` (screen heights × 100).
-- The still version is used with reduced motion, data saver, short screens and portrait screens narrower than 600 px. The Motion button switches it by hand.
+- Phones get the animation too, cropped to the middle of the widescreen footage. The still version is used with reduced motion, data saver and very short screens (phones held sideways). The Motion button switches it by hand.

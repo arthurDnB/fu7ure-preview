@@ -35,8 +35,8 @@
   const collectionNav = merchandise.querySelector(".collection-nav");
   const collectionLinks = [...collectionNav.querySelectorAll("a")];
   const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
-  // The still version covers short screens and small portrait screens; data saver starts there too.
-  const smallViewport = matchMedia("(max-height: 470px), (max-width: 760px) and (max-height: 560px), (orientation: portrait) and (max-width: 599.98px)");
+  // The still version covers very short screens (phones held sideways); data saver starts there too.
+  const smallViewport = matchMedia("(max-height: 470px), (max-width: 760px) and (max-height: 560px)");
   const containFit = matchMedia("(min-aspect-ratio: 2/1)");
   const saveData = navigator.connection?.saveData === true;
   const config = window.fu7ureVideos || {};
@@ -210,7 +210,12 @@
     video.dataset.scene = scene.article.id;
     scene.video = video;
     video.addEventListener("loadedmetadata", () => { scene.frames = Math.max(1, Math.round(video.duration * FPS)); schedule(); });
-    video.addEventListener("loadeddata", () => { if (scene.decoded < 0) scene.decoded = Math.round(video.currentTime * FPS - .5); schedule(); });
+    video.addEventListener("loadeddata", () => {
+      if (scene.decoded < 0) scene.decoded = Math.round(video.currentTime * FPS - .5);
+      // Some phone browsers only draw a video's frames once it has played: a muted play and pause wakes it up.
+      video.play().then(() => { video.pause(); scene.requested = -1; schedule(); }).catch(() => {});
+      schedule();
+    }, { once: true });
     video.addEventListener("seeked", () => { scene.decoded = scene.requested; schedule(); });
     video.src = source;
     videoContainer.append(video);

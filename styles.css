@@ -11,7 +11,7 @@
   --header: 66px;
   --gutter: clamp(20px, 4.3vw, 74px);
   --stage-height: calc(100svh - var(--header));
-  --step: 80vh;
+  --step: 85vh;
 }
 
 * { box-sizing: border-box; }
@@ -72,7 +72,8 @@ h1 span { color: var(--accent); }
 .style-legend dt a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .style-legend dd { margin: 5px 0 0; color: var(--muted); line-height: 1.45; }
 .still-look > div { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 18px; }
-.still-look img { width: 100%; aspect-ratio: 16/9; object-fit: cover; border: 1px solid var(--line); }
+.still-look > div.single { grid-template-columns: minmax(0,1fr); }
+.still-look img, .still-look video { display: block; width: 100%; height: auto; aspect-ratio: 16/9; object-fit: cover; border: 1px solid var(--line); background: #161917; }
 .still-look figcaption { margin-top: 9px; color: var(--muted); font: 12px/1.3 var(--mono); text-transform: uppercase; }
 .footer {
   min-height: 100px; padding: 20px var(--gutter); border-top: 1px solid var(--line);
@@ -95,7 +96,7 @@ h1 span { color: var(--accent); }
   position: absolute; inset: 0; content: ""; pointer-events: none;
 }
 .artwork::before {
-  background: #161917 var(--scene-image, url("media/r2-sasha-likeness-front.webp")) center / cover;
+  background: #161917 var(--scene-image, none) center / cover;
   transform: scale(1.06); filter: blur(17px) brightness(.59) saturate(.9);
 }
 .artwork::after {
@@ -104,22 +105,46 @@ h1 span { color: var(--accent); }
     linear-gradient(to top, #0a0c0bf7 1%, #0a0c0b99 12%, transparent 34%),
     linear-gradient(to right, #0a0c0b60, transparent 30%, transparent 70%, #0a0c0b60);
 }
+/* One full-screen stage: the footage fills it, and nothing behind it shows during a hand-over. */
 .image-stage {
-  position: absolute; left: 0; right: 0; top: 48%;
-  height: min(calc(100% - 42px), 66vw); transform: translateY(-50%);
+  position: absolute; inset: 0;
   overflow: hidden; isolation: isolate;
-  mask-image: linear-gradient(to bottom, transparent, black 7%, black 91%, transparent);
 }
-.frame-image, .videos, .videos video, .pillar {
+.frame-image, .videos, .videos video, .pillar, .dust {
   position: absolute; inset: 0; width: 100%; height: 100%;
 }
-.frame-image, .videos video { object-fit: cover; object-position: center; }
-.frame-image { transform: scale(var(--scale, 1)); }
+.frame-image, .videos video { object-fit: cover; object-position: var(--focus-x, 50%) 50%; }
+.frame-image, .videos {
+  transform: translateX(var(--film-x, 0px)) scale(var(--film-scale, 1));
+  transform-origin: 50% 50%;
+}
 .frame-secondary, .videos video { opacity: 0; }
-.videos { pointer-events: none; }
+.videos, .dust { pointer-events: none; }
+/* While a clip downloads, a thin line at the top of the stage shows how far it has got. */
+.stage[data-loading]::after {
+  content: ""; position: absolute; left: 0; top: 0; z-index: 3; height: 2px;
+  width: calc(var(--load, 0) * 100%); background: var(--accent); transition: width .2s linear;
+}
+.dust { mix-blend-mode: screen; }
+/* The steel column in front of the lens: fully opaque, with soft edges that stretch with speed like motion blur. */
 .pillar {
-  pointer-events: none; background: #181714 url("media/yard-pillar.webp") center / cover;
+  pointer-events: none; will-change: transform;
+  background:
+    linear-gradient(to right, #000000e6, #0000 13%, #ffecd212 44%, #0000 58%, #000000f0),
+    url("media/yard-pillar.webp") center / cover,
+    #181714;
   transform: translateX(101%);
+}
+.pillar::before, .pillar::after {
+  content: ""; position: absolute; top: 0; bottom: 0; width: 14%; pointer-events: none;
+}
+.pillar::before {
+  right: 100%; background: linear-gradient(to right, #0000, #000000d9);
+  transform-origin: right; transform: scaleX(var(--smear, 1));
+}
+.pillar::after {
+  left: 100%; background: linear-gradient(to right, #000000d9, #0000);
+  transform-origin: left; transform: scaleX(var(--smear, 1));
 }
 .sr-only {
   position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden;
@@ -220,8 +245,6 @@ h1 {
   .artwork::after {
     background: linear-gradient(to bottom, #101211e0 5%, transparent 30%, transparent 61%, #101211e8 91%);
   }
-  .image-stage { height: min(72%, 74vw); top: 48%; }
-  .callouts { top: calc(48% + min(23vw, 23vh)); }
   .style-link { min-height: 40px; font-size: clamp(14px, 4vw, 22px); padding: 9px 8px; gap: 6px; }
   .looks button { font-size: 11px; line-height: 1.15; }
   .tab-number { font-size: 9px; }
@@ -369,6 +392,10 @@ h1 {
   margin: clamp(11px, 1.7vw, 25px) 0 0;
   font: 700 clamp(10px, 1.4vw, 18px)/1.3 var(--mono);
   letter-spacing: .10em; text-transform: uppercase;
+}
+/* On tall screens the closing pair fills the width, so the wordmark sits above their heads instead. */
+@media (max-aspect-ratio: 5/4) {
+  .stage .closing-message { top: clamp(44px, 9vh, 110px); transform: none; }
 }
 .closing-still { position: relative; isolation: isolate; margin-top: clamp(18px, 2.5vw, 34px); }
 .closing-still .closing-message { top: 50%; margin: 0; color: var(--ink); }

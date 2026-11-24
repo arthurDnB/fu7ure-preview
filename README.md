@@ -8,10 +8,13 @@ To walk through checkout, add an item by size, open Demo checkout, and select **
 
 All items, specifications, prices, stock, delivery rates and orders are for the prototype. A commercial launch needs final product information, a commerce host, real fulfillment and payments, and connected email and support services.
 
-## Replace the Show motion studies
+## The Show
 
-1. Add the final, widened 16:9 H.264 MP4 files to `media/`. Keep the first pair’s opening visible, start clips two and three behind the pillar, end clips one and two behind it, and end clip three on the clear closing pose. Exports with frequent keyframes offer smoother seeking in both directions.
-2. Set the matching values in `media-config.js` to the relative file paths. Example: `"r2-sasha": "media/r2-sasha.mp4"`.
-3. Refresh the page. Each available clip takes over its chapter independently. The still sequence covers missing or unsupported video. Motion-off mode shows the wardrobe stills.
+One sticky full-screen stage plays three live-action clips, one per duet, scrubbed frame by frame by the scroll. The camera follows the scroll on a spring, so it speeds up and then settles. A steel pillar crosses right to left between duets and stays fully closed while the clip changes. Each duet's style labels show only on its front view and hide while the pillar crosses.
 
-The three prototype clips are motion studies made from the authored reference artwork. The chapter buttons jump between pairs of styles. The floating labels follow the cast and open the matching collection.
+- Clips are set in `media-config.js`. They must be 16:9 H.264 MP4 with a keyframe on every frame (`-g 1`) so they seek smoothly both ways.
+- **R2 and Sasha never go in this folder or in git.** Sasha's face is based on a real person, so clip 01 loads from its Higgsfield URL, and the still version shows that clip's first frame instead of an image file.
+- Clips 02 and 03 live in `media/show/`. Their start and end frames (`media/*-v3-*.webp`) are the stills under the video and in the still version.
+- Timing, label windows and the dancers' chest positions are in `sceneDesigns` in `site.js`. If a clip is replaced, re-read the positions from the new footage.
+- Scroll per duet is `--step` in `styles.css`. Try other values on a preview with `?step=70` (screen heights × 100).
+- The still version is used with reduced motion, data saver, short screens and portrait screens narrower than 600 px. The Motion button switches it by hand.

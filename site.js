@@ -361,12 +361,19 @@
     // A clip shows once it has decoded a frame near the wanted one; after that it stays up even if it trails a fast scroll.
     const video = scene.video;
     const ready = video && !video.error && video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA;
-    if (ready && (scene.shown || !scene.startSrc || Math.abs(scene.decoded - scene.wanted) <= 30)) scene.shown = true;
+    if (!scene.shown && ready && (!scene.startSrc || Math.abs(scene.decoded - scene.wanted) <= 30)) {
+      scene.shown = true;
+      // The still underneath is a separate picture of the same moment, so the clip fades in over it
+      // when it first arrives in view; behind the pillar the swap stays instant.
+      const inView = Math.abs(pillarOverride ?? pillarOffset(show)) > 99;
+      video.style.transition = inView ? "opacity .35s ease" : "none";
+      if (inView) setTimeout(() => { video.style.transition = "none"; }, 400);
+    }
     scenes.forEach((item) => {
       if (item.video) item.video.style.opacity = item === scene && scene.shown ? "1" : "0";
     });
     endStill.style.opacity = share > .5 ? "1" : "0";
-    const pictured = scene.shown || Boolean(scene.startSrc);
+    const pictured = scene.shown || (!startStill.hidden && startStill.complete && startStill.naturalWidth > 0);
     stage.toggleAttribute("data-loading", !scene.shown);
     stage.style.setProperty("--load", String(scene.loaded || 0));
 
@@ -466,17 +473,6 @@
       scene.article.getBoundingClientRect().top <= probe ? index : closest, 0);
   }
 
-  // R2 and Sasha are never stored on the site: in the still version their frame is the first frame of their clip.
-  function prepareStillFrames() {
-    for (const frame of gallery.querySelectorAll("[data-remote-frame] video")) {
-      if (frame.getAttribute("src")) continue;
-      const source = config[frame.closest("[data-remote-frame]").dataset.remoteFrame];
-      if (!source) continue;
-      frame.preload = "metadata";
-      frame.src = source + "#t=0.05";
-    }
-  }
-
   function syncMode() {
     const wasOn = motionOn;
     const anchor = byId(location.hash.slice(1));
@@ -492,7 +488,7 @@
     gallery.hidden = motionOn;
     // One h1: it sits in the stage while the Show moves, and heads the still version otherwise.
     if (motionOn) stageHeading.prepend(showTitle);
-    else { gallery.prepend(showTitle); prepareStillFrames(); }
+    else gallery.prepend(showTitle);
 
     if (keepSection) {
       if (!modeInitialized || motionOn !== wasOn) {

@@ -56,23 +56,23 @@
       brands: [{ name: "R2", logo: "r2-pin-stack-r1.svg" }, { name: "MOLOT", logo: "molot-coupler-r1.svg" }],
       clip: (t) => clamp((t - 0.02) / 0.98),
       labels: [0, 0.25],
-      keys: [[0, .43, .35, .54, .34], [.097, .43, .35, .56, .34], [.193, .45, .35, .57, .34], [.29, .45, .35, .54, .34]],
-      views: [[0.25, "FRONT VIEW"], [0.62, "SIDE VIEW"], [1, "REAR VIEW"]],
+      keys: [[0, .42, .36, .56, .33], [.126, .42, .36, .58, .33], [.25, .46, .36, .56, .33], [.38, .46, .37, .54, .34]],
+      views: [[0.27, "FRONT VIEW"], [0.6, "SIDE VIEW"], [1, "THREE-QUARTER BACK"]],
     },
     "tsubasa-qu4nt": {
       brands: [{ name: "H4J1ME", logo: "h4j1me-pole-position-r1.svg" }, { name: "8888", logo: "8888-faction-01-wordmark.svg" }],
       clip: (t) => t,
-      labels: [0.14, 0.36],
-      keys: [[0, .39, .36, .60, .34], [.104, .38, .36, .58, .34], [.207, .37, .36, .56, .34], [.311, .40, .36, .57, .34]],
-      views: [[0.36, "FRONT VIEW"], [0.62, "SIDE VIEW"], [1, "REAR VIEW"]],
+      labels: [0.1, 0.6],
+      keys: [[0, .38, .35, .58, .34], [.14, .39, .35, .61, .33], [.28, .43, .35, .63, .33], [.42, .42, .36, .61, .33], [.56, .38, .37, .59, .33], [.70, .40, .37, .58, .33], [.85, .40, .38, .58, .32], [1, .43, .37, .58, .31]],
+      views: [[0.62, "FRONT VIEW"], [1, "SIDE VIEW"]],
     },
     "v3sp3r-l0wk3y": {
       brands: [{ name: "R4V3NS", logo: "r4v3ns-faction-03-v8-wordmark.svg" }, { name: "ROLL3RZ", logo: "roll3rz-double-link-r1.svg" }],
       clip: (t) => clamp(t / 0.82),
       closing: 0.82,
-      labels: [0.64, 1],
-      keys: [[.694, .43, .35, .59, .35], [.826, .44, .35, .56, .35], [.926, .44, .35, .55, .35], [.992, .43, .35, .55, .35]],
-      views: [[0.6, "SIDE VIEW"], [1, "FRONT VIEW"]],
+      labels: [0.72, 1],
+      keys: [[.63, .38, .32, .58, .32], [.66, .37, .33, .58, .33], [.785, .39, .36, .58, .34], [.893, .41, .36, .555, .34], [1, .41, .36, .54, .34]],
+      views: [[0.7, "SIDE VIEW"], [1, "FRONT VIEW"]],
     },
   };
 
@@ -85,8 +85,8 @@
       href: item.querySelector("dt a").getAttribute("href"),
       tone: item.dataset.tone,
     })),
-    startSrc: article.querySelector("[data-start] img")?.getAttribute("src") || "",
-    endSrc: article.querySelector("[data-end] img")?.getAttribute("src") || "",
+    startSrc: article.dataset.poster || article.querySelector("[data-start] img")?.getAttribute("src") || "",
+    endSrc: article.dataset.posterEnd || article.querySelector("[data-end] img")?.getAttribute("src") || "",
     videoPath: config[article.id],
     loading: null,
     video: null,
@@ -157,7 +157,12 @@
       element.dataset.tone = style.tone;
       label.textContent = style.name;
       const mark = scene.design.brands[styleIndex];
+      // A label only shows once its own maker mark has been drawn, so it can never show the previous duet's maker.
+      const control = styleControls[styleIndex];
+      control.logoReady = false;
       logo.src = "media/marks/" + mark.logo;
+      logo.decode().then(() => { control.logoReady = true; schedule(); },
+        () => { control.logoReady = logo.complete && logo.naturalWidth > 0; schedule(); });
       logo.alt = mark.name;
       logo.title = mark.name;
       link.href = style.href;
@@ -389,7 +394,7 @@
     // Closing: the last pair slides right and the camera leans in, which clears the left for the wordmark.
     const push = scene.design.closing ? ease((progress - scene.design.closing) / (1 - scene.design.closing)) : 0;
     const wide = stage.clientWidth / stage.clientHeight > 1.25;
-    const scale = 1 + (wide ? .12 : .05) * push;
+    const scale = 1 + (wide ? .12 : 0) * push;
     const panX = (wide ? .06 : 0) * imageStage.clientWidth * push;
     imageStage.style.setProperty("--film-scale", scale.toFixed(4));
     imageStage.style.setProperty("--film-x", panX.toFixed(1) + "px");
@@ -402,7 +407,8 @@
     const points = keyPoints(scene.design.keys, share);
     const [from, to] = scene.design.labels;
     const facing = clamp(1 - (from - share) / .03) * clamp(1 - (share - to) / .03);
-    const labelOpacity = pictured ? facing * clamp((Math.abs(offset) - 55) / 25) : 0;
+    const marksReady = styleControls.every((control) => control.logoReady);
+    const labelOpacity = pictured && marksReady ? facing * clamp((Math.abs(offset) - 55) / 25) : 0;
     callouts.style.setProperty("--callout-opacity", labelOpacity.toFixed(3));
     callouts.inert = labelOpacity < .05;
     const focusTarget = facing > 0 ? (points[0][0] + points[1][0]) / 2 : .5;

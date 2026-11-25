@@ -12,9 +12,9 @@ All items, specifications, prices, stock, delivery rates and orders are for the 
 
 One sticky full-screen stage plays three live-action clips, one per duet, scrubbed frame by frame by the scroll. The camera follows the scroll on a spring, so it speeds up and then settles. A steel pillar crosses right to left between duets and stays fully closed while the clip changes. Each duet's style labels show only on its front view and hide while the pillar crosses.
 
-- Clips are set in `media-config.js`. They must be 16:9 H.264 MP4 with a keyframe on every frame (`-g 1`) so they seek smoothly both ways.
-- **R2 and Sasha never go in this folder or in git.** Sasha's face is based on a real person, so clip 01 and its opening still load from their Higgsfield URLs. The still is Higgsfield's small copy (`_min.webp`: full size, about 190 KB), used under the clip while it downloads and in the still version.
-- Clips 02 and 03 live in `media/show/`. Their start and end frames (`media/*-v3-*.webp`) are the stills under the video and in the still version.
+- Clips are set in `media-config.js`: the "720p max" renders (7-10 MB each). They must be 16:9 H.264 MP4 with a keyframe on every frame (`-g 1`) so they seek smoothly both ways. Lighter versions of the same takes are listed there as a comment, to swap in if phones struggle.
+- **R2 and Sasha never go in this folder or in git.** Sasha's face is based on a real person, so clip 01, its poster (frame 0, used under the clip while it downloads) and the still-version photo all load from their Higgsfield URLs. The poster is the article's `data-poster` in `index.html`.
+- Clips 02 and 03 live in `media/show/`. Their start and end frames (`media/*-720max-*.webp`) sit under the video; the still version uses those frames, plus Higgsfield's photo with QU4NT's episode face for duet 2.
 - Timing, label windows and the dancers' chest positions are in `sceneDesigns` in `site.js`. If a clip is replaced, re-read the positions from the new footage.
 - Scroll per duet is `--step` in `styles.css`. Try other values on a preview with `?step=70` (screen heights × 100).
 - Phones get the animation too, cropped to the middle of the widescreen footage. The still version is used with reduced motion, data saver and very short screens (phones held sideways). The Motion button switches it by hand.

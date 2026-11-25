@@ -10,13 +10,22 @@
   --mono: "Cascadia Mono", Consolas, monospace;
   --header: 66px;
   --gutter: clamp(20px, 4.3vw, 74px);
-  --stage-height: calc(100svh - var(--header));
+  /* Phone toolbars slide in and out while scrolling. The stage is as tall as the screen with the toolbar hidden,
+     so the footage covers the strip the toolbar uncovers; the controls stay above the toolbar (--toolbar-gap). */
+  --screen: 100svh;
+  --toolbar-gap: 0px;
+  --stage-height: calc(var(--screen) - var(--header));
   --step: 85vh;
+}
+@supports (height: 1lvh) {
+  :root { --screen: 100lvh; --toolbar-gap: calc(100lvh - 100svh); }
 }
 
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 html { background: var(--bg); }
+/* No rubber-band or pull-to-refresh while scrubbing back to the opening of the Show. */
+html[data-scroll-motion] { overscroll-behavior-y: none; }
 body { margin: 0; color: var(--ink); font-family: var(--body); }
 button, a { color: inherit; }
 button { font: inherit; cursor: pointer; }
@@ -119,6 +128,9 @@ h1 span { color: var(--accent); }
   transform-origin: 50% 50%;
 }
 .frame-secondary, .videos video { opacity: 0; }
+/* High-resolution picture of a clip's first or last frame, shown over the footage while the Show is at rest. */
+.frame-crisp { opacity: 0; pointer-events: none; }
+.frame-crisp.is-on { opacity: 1; }
 .videos, .dust { pointer-events: none; }
 /* While a clip downloads, a thin line at the top of the stage shows how far it has got. */
 .stage[data-loading]::after {
@@ -196,7 +208,7 @@ h1 {
 .style-arrow { flex: none; color: var(--style-ink); font: .65em/1 var(--mono); }
 
 .stage-footer {
-  position: absolute; inset-inline: var(--gutter); bottom: 0;
+  position: absolute; inset-inline: var(--gutter); bottom: var(--toolbar-gap);
 }
 .stage-controls { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 .view-label { color: var(--muted); white-space: nowrap; }
@@ -237,7 +249,7 @@ h1 {
 }
 
 @media (max-width: 760px) {
-  :root { --header: 54px; --gutter: 16px; --stage-height: calc(100svh - var(--header)); }
+  :root { --header: 54px; --gutter: 16px; }
   .motion-button, .bag-toggle { min-height: 34px; padding: 7px 8px; font-size: 10px; gap: 6px; }
   .stage-heading { top: 25px; }
   .stage-index, .view-label, .orbit { font-size: 10px; }

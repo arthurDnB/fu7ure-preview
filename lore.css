@@ -144,7 +144,9 @@
    The strip is scaled so one face fills the box width, and placed so her chin sits near the bottom edge. */
 .face-strip { position: relative; overflow: hidden; container-type: size; }
 .face-strip > img, .cast-tabs button .face-strip > img, .cast-picture.face-strip > img {
-  position: absolute; left: 0; width: 400cqw; max-width: none; height: auto; max-height: none; aspect-ratio: auto;
+  /* A fixed height (the strip is 2720 x 1536) keeps the box the right size before the picture arrives; with
+     height: auto it was 0 px tall and outside the crop, so the browser never started the lazy load of the tab. */
+  position: absolute; left: 0; width: 400cqw; max-width: none; height: 225.9cqw; max-height: none; aspect-ratio: auto;
   object-fit: fill; top: clamp(calc(100cqh - 225.9cqw), calc(100cqh - 102.9cqw), 0px);
 }
 .cast-tabs button .face-strip { display: block; padding: 0; aspect-ratio: 1.55; }

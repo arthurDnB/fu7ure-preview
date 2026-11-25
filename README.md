@@ -17,4 +17,7 @@ One sticky full-screen stage plays three live-action clips, one per duet, scrubb
 - Clips 02 and 03 live in `media/show/`. Their start and end frames (`media/*-720max-*.webp`) sit under the video; the still version uses those frames, plus Higgsfield's photo with QU4NT's episode face for duet 2.
 - Timing, label windows and the dancers' chest positions are in `sceneDesigns` in `site.js`. If a clip is replaced, re-read the positions from the new footage.
 - Scroll per duet is `--step` in `styles.css`. Try other values on a preview with `?step=70` (screen heights × 100).
+- Autoplay: after 4 s without input the Show plays itself to the closing view by scrolling the page; any scroll, swipe, key or click takes over, and it carries on after 8 s without input. `?autoplay=0` turns it off (automated tests use it). Settings are the `AUTOPLAY_*` constants in `site.js`.
+- Chapter buttons land on each duet's front view with its labels up (`land` in `sceneDesigns`).
+- Crisp stills: `data-crisp-start` / `data-crisp-end` on a duet's article give a high-resolution picture of that clip's first / last frame, shown over the footage while the Show rests on that exact frame. It must be the same frame upscaled (same framing), or it will visibly jump. Anything with Sasha loads from a Higgsfield URL, never from this folder.
 - Phones get the animation too, cropped to the middle of the widescreen footage. The still version is used with reduced motion, data saver and very short screens (phones held sideways). The Motion button switches it by hand.

@@ -9,6 +9,7 @@
   const header = document.querySelector(".masthead");
   const startStill = byId("frame-front");
   const endStill = byId("frame-finish");
+  const crisp = byId("frame-crisp");
   const closingMessage = byId("closing-message");
   const pillar = byId("pillar");
   const title = byId("look-title");
@@ -49,12 +50,14 @@
   const stepParam = Number(new URLSearchParams(location.search).get("step"));
   if (stepParam >= 40 && stepParam <= 160) document.documentElement.style.setProperty("--step", stepParam + "vh");
 
-  // Per clip: which part of the duet's scroll each clip covers, when the labels show (front views only),
+  // Per clip: which part of the duet's scroll each clip covers, where the chapter buttons land (the front view
+  // with the labels up), when the labels show (front views only),
   // and where each dancer's chest is, read from the footage. Keys: [clip share, left x, y, right x, y].
   const sceneDesigns = {
     "r2-sasha": {
       brands: [{ name: "R2", logo: "r2-pin-stack-r1.svg" }, { name: "MOLOT", logo: "molot-coupler-r1.svg" }],
       clip: (t) => clamp((t - 0.02) / 0.98),
+      land: 0,
       labels: [0, 0.25],
       keys: [[0, .42, .36, .56, .33], [.126, .42, .36, .58, .33], [.25, .46, .36, .56, .33], [.38, .46, .37, .54, .34]],
       views: [[0.27, "FRONT VIEW"], [0.6, "SIDE VIEW"], [1, "THREE-QUARTER BACK"]],
@@ -62,6 +65,7 @@
     "tsubasa-qu4nt": {
       brands: [{ name: "H4J1ME", logo: "h4j1me-pole-position-r1.svg" }, { name: "8888", logo: "8888-faction-01-wordmark.svg" }],
       clip: (t) => t,
+      land: PILLAR_CROSS + .01,
       labels: [0.1, 0.6],
       keys: [[0, .38, .35, .58, .34], [.14, .39, .35, .61, .33], [.28, .43, .35, .63, .33], [.42, .42, .36, .61, .33], [.56, .38, .37, .59, .33], [.70, .40, .37, .58, .33], [.85, .40, .38, .58, .32], [1, .43, .37, .58, .31]],
       views: [[0.62, "FRONT VIEW"], [1, "SIDE VIEW"]],
@@ -70,6 +74,7 @@
       brands: [{ name: "R4V3NS", logo: "r4v3ns-faction-03-v8-wordmark.svg" }, { name: "ROLL3RZ", logo: "roll3rz-double-link-r1.svg" }],
       clip: (t) => clamp(t / 0.82),
       closing: 0.82,
+      land: 0.82,
       labels: [0.72, 1],
       keys: [[.63, .38, .32, .58, .32], [.66, .37, .33, .58, .33], [.785, .39, .36, .58, .34], [.893, .41, .36, .555, .34], [1, .41, .36, .54, .34]],
       views: [[0.7, "SIDE VIEW"], [1, "FRONT VIEW"]],
@@ -114,6 +119,15 @@
   let wipe = null;
   let focus = 0.5;
   const WIPE_MS = 700;
+  // Autoplay: when nobody scrolls, the Show plays itself through to the closing view. It moves the page as it goes,
+  // so a scroll, swipe, key press or click takes over from the same spot. ?autoplay=0 turns it off (for testing).
+  const AUTOPLAY_WAIT = 4000;     // ms without input after arriving before it starts
+  const AUTOPLAY_RESUME = 8000;   // ms without input before it carries on once someone has steered
+  const AUTOPLAY_PACE = 1.1;      // the footage plays a little slower than real time
+  const autoplayAllowed = new URLSearchParams(location.search).get("autoplay") !== "0";
+  let autoplay = null;
+  let lastInput = performance.now();
+  let steered = false;
 
   function clamp(value, low = 0, high = 1) { return Math.min(high, Math.max(low, value)); }
   const ease = (value) => {
@@ -329,9 +343,12 @@
     return { x: Math.random(), y: Math.random(), z, rise: (.004 + Math.random() * .01) * z, alpha: .08 + Math.random() * .34, phase: Math.random() * 6.28, spark: Math.random() < .2 };
   });
   function sizeDust() {
+    // Resizing a canvas wipes it, so only when its size really changed (phone toolbars fire resize while scrolling).
     const ratio = Math.min(2, devicePixelRatio || 1);
-    dust.width = Math.round(dust.clientWidth * ratio);
-    dust.height = Math.round(dust.clientHeight * ratio);
+    const width = Math.round(dust.clientWidth * ratio);
+    const height = Math.round(dust.clientHeight * ratio);
+    if (dust.width !== width) dust.width = width;
+    if (dust.height !== height) dust.height = height;
   }
   function drawDust(dt) {
     const { width, height } = dust;
@@ -389,6 +406,19 @@
 
     const offset = pillarOverride ?? pillarOffset(show);
     pillar.style.transform = "translateX(" + offset.toFixed(2) + "%)";
+
+    // At rest on a clip's first or last frame, a high-resolution picture of that same frame sits over the footage,
+    // so the still moment is crisp. It goes the instant anything moves.
+    const crispSource = !scene.frames || scene.decoded !== scene.wanted ? "" :
+      scene.wanted === 0 ? scene.article.dataset.crispStart : scene.wanted === scene.frames - 1 ? scene.article.dataset.crispEnd : "";
+    const resting = !autoplay && !wipe && Math.abs(velocity) < .002 && Math.abs(target - position) < .001;
+    const crispWanted = !!crispSource && scene.shown && resting && Math.abs(offset) > 99;
+    if (crispWanted && crisp.getAttribute("src") !== crispSource) crisp.src = crispSource;
+    const crispOn = crispWanted && crisp.getAttribute("src") === crispSource && crisp.complete && crisp.naturalWidth > 0;
+    if (crispOn !== crisp.classList.contains("is-on")) {
+      crisp.style.transition = crispOn ? "opacity .4s ease" : "none";
+      crisp.classList.toggle("is-on", crispOn);
+    }
     pillar.style.setProperty("--smear", (1 + Math.min(1.5, Math.abs(velocity) * 1.2)).toFixed(2));
 
     // Closing: the last pair slides right and the camera leans in, which clears the left for the wordmark.
@@ -417,7 +447,7 @@
 
     tracker.style.transform = "scaleX(" + (show / scenes.length) + ")";
     viewLabel.textContent = closingOpacity > .5 ? "CLOSING VIEW" : (scene.design.views.find(([end]) => share <= end) || [0, ""])[1];
-    orbitLabel.textContent = show < .03 ? "Scroll to explore" : index < last ? "Next styles" : progress < .9 ? "Closing view" : "Back to start";
+    orbitLabel.textContent = autoplay ? "Playing · scroll to take over" : show < .03 ? "Scroll to explore" : index < last ? "Next styles" : progress < .9 ? "Closing view" : "Back to start";
     if (onScreen) drawDust(dt);
   }
 
@@ -430,6 +460,23 @@
     lastTime = now;
     const { start, distance } = scrollRange();
     target = clamp((scrollY - start) / distance) * scenes.length;
+    // Autoplay scrolls the page itself; any other change of the scroll position means the visitor took over.
+    if (autoplay && Math.abs(scrollY - autoplay.y) > 3) takeOver();
+    if (mayAutoplay(now, start, distance)) autoplay = { show: target, speed: 0, y: scrollY };
+    if (autoplay) {
+      const index = Math.min(last, Math.floor(autoplay.show));
+      const ahead = scenes[Math.min(last, Math.floor(autoplay.show + .35))];
+      const left = scenes.length - autoplay.show;
+      // Speeds up gently, waits before the pillar if the next clip is still downloading, and settles into the closing view.
+      const wanted = clipReady(scenes[index]) && clipReady(ahead) ? autoplayRate(index) * clamp(left / .15, .15, 1) : 0;
+      autoplay.speed += (wanted - autoplay.speed) * Math.min(1, dt * 2.5);
+      autoplay.show = left < 1e-3 ? scenes.length : Math.min(scenes.length, autoplay.show + autoplay.speed * dt);
+      scrollTo({ top: start + distance * autoplay.show / scenes.length, behavior: "instant" });
+      autoplay.y = scrollY;
+      target = autoplay.show;
+      if (!wipe) { position = target; velocity = autoplay.speed; }
+      if (autoplay.show >= scenes.length) autoplay = null;
+    }
     const targetScene = Math.min(last, Math.floor(target));
     if (snap === "hard" || (snap && currentScene < 0)) {
       position = target;
@@ -454,7 +501,7 @@
       const before = position;
       const stiffness = 46;
       const damping = 2 * Math.sqrt(stiffness);
-      for (let remaining = dt; remaining > 1e-5;) {
+      for (let remaining = autoplay ? 0 : dt; remaining > 1e-5;) {
         const h = Math.min(.012, remaining);
         velocity += (stiffness * (target - position) - damping * velocity) * h;
         position += velocity * h;
@@ -473,6 +520,30 @@
     else lastTime = 0;
   }
 
+  function takeOver() {
+    lastInput = performance.now();
+    steered = true;
+    autoplay = null;
+  }
+
+  function clipReady(scene) {
+    const video = scene?.video;
+    return !!video && !video.error && video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA && scene.frames > 0;
+  }
+
+  // Show units per second for a duet: its clip at the autoplay pace, plus the closing after the last clip.
+  function autoplayRate(index) {
+    const scene = scenes[index];
+    return 1 / ((scene.frames ? scene.frames / FPS : 4) * AUTOPLAY_PACE / (scene.design.closing || 1));
+  }
+
+  function mayAutoplay(now, start, distance) {
+    return autoplayAllowed && !autoplay && motionOn && onScreen && !wipe && !document.hidden &&
+      now - lastInput >= (steered ? AUTOPLAY_RESUME : AUTOPLAY_WAIT) &&
+      scrollY >= start - 2 && scrollY < start + distance - 2 &&
+      !!scenes[currentScene]?.shown && !document.querySelector("dialog[open], .photo-viewer[open]");
+  }
+
   function schedule() {
     if (!motionOn || frameRequest) return;
     frameRequest = requestAnimationFrame(tick);
@@ -486,6 +557,7 @@
 
   function syncMode() {
     const wasOn = motionOn;
+    autoplay = null;
     const anchor = byId(location.hash.slice(1));
     const destination = anchor?.closest("[data-after-film]");
     const keepSection = destination &&
@@ -507,7 +579,8 @@
       }
     } else if (motionOn && !wasOn) {
       const requested = scenes.findIndex(({ article }) => "#" + article.id === location.hash);
-      jumpTo(requested >= 0 ? requested : resumeIndex, requested >= 0 || resumeIndex > 0 ? PILLAR_CROSS + .01 : 0, "hard");
+      const landing = requested >= 0 ? requested : resumeIndex;
+      jumpTo(landing, scenes[landing].design.land, "hard");
     } else if (!motionOn && wasOn) {
       scenes[resumeIndex].article.scrollIntoView();
     }
@@ -543,10 +616,10 @@
     byId("track-accessories").closest(".product-expander").open = true;
   });
 
-  // Chapter buttons land just after the pillar has cleared, on the duet's opening view.
-  jumps.forEach((button, index) => button.addEventListener("click", () => jumpTo(index, index ? PILLAR_CROSS + .01 : 0)));
+  // Chapter buttons land on the duet's front view with its labels up.
+  jumps.forEach((button, index) => button.addEventListener("click", () => jumpTo(index, scenes[index].design.land)));
   orbitButton.addEventListener("click", () => {
-    if (currentScene < last) jumpTo(currentScene + 1, PILLAR_CROSS + .01);
+    if (currentScene < last) jumpTo(currentScene + 1, scenes[currentScene + 1].design.land);
     else if (currentProgress < .9) jumpTo(last, 1);
     else jumpTo(0);
   });
@@ -558,6 +631,7 @@
   reducedMotion.addEventListener("change", syncMode);
   smallViewport.addEventListener("change", syncMode);
   styleControls.forEach(({ logo }) => logo.addEventListener("load", schedule));
+  crisp.addEventListener("load", schedule);
   if ("IntersectionObserver" in window) {
     new IntersectionObserver(([entry]) => {
       onScreen = entry.isIntersecting;
@@ -566,6 +640,7 @@
     }).observe(stage);
   }
   addEventListener("resize", () => { if (motionOn) sizeDust(); schedule(); }, { passive: true });
+  for (const type of ["wheel", "touchstart", "pointerdown", "keydown"]) addEventListener(type, takeOver, { passive: true, capture: true });
   addEventListener("scroll", schedule, { passive: true });
   addEventListener("pageshow", schedule);
 

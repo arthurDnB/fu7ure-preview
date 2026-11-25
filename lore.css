@@ -129,8 +129,9 @@
   position: relative; width: 100%; padding: 0; text-align: left; overflow: clip;
   border: 1px solid var(--line); border-bottom: 2px solid var(--line); background: #21231e;
 }
+/* Every cast picture is cropped to the same face size and eye line (tabs 1.3:1, opened portraits square). */
 .cast-tabs button img {
-  width: 100%; aspect-ratio: 1.55; height: auto; object-fit: cover; object-position: center 29%;
+  width: 100%; aspect-ratio: 1.3; height: auto; object-fit: cover; object-position: center;
   filter: grayscale(.78) brightness(.65); transition: filter .25s;
 }
 .cast-tabs button span { display: block; padding: 9px 11px; font: 700 13px/1.25 var(--mono); }
@@ -138,18 +139,22 @@
 .cast-tabs button[aria-selected="true"] { border-color: var(--tone); color: var(--tone); }
 .cast-tabs button:focus-visible, .story-tabs button:focus-visible { outline-offset: -4px; }
 .cast-panel { display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); border-top: 2px solid var(--tone); }
-.cast-picture { width: 100%; height: 100%; min-height: 355px; position: relative; background: #363931; }
-.cast-picture img { width: 100%; height: 100%; max-height: 600px; object-fit: cover; object-position: center 33%; }
-/* Sasha's portrait loads from Higgsfield as a strip of four faces; only the first (front) face shows.
-   The strip is scaled so one face fills the box width, and placed so her chin sits near the bottom edge. */
-.face-strip { position: relative; overflow: hidden; container-type: size; }
-.face-strip > img, .cast-tabs button .face-strip > img, .cast-picture.face-strip > img {
-  /* A fixed height (the strip is 2720 x 1536) keeps the box the right size before the picture arrives; with
-     height: auto it was 0 px tall and outside the crop, so the browser never started the lazy load of the tab. */
-  position: absolute; left: 0; width: 400cqw; max-width: none; height: 225.9cqw; max-height: none; aspect-ratio: auto;
-  object-fit: fill; top: clamp(calc(100cqh - 225.9cqw), calc(100cqh - 102.9cqw), 0px);
+/* Always square, so every face is the same size; when the text beside it is taller, the picture stays at the top. */
+.cast-picture { width: 100%; aspect-ratio: 1; align-self: start; min-height: 0; position: relative; overflow: hidden; background: #363931; }
+.cast-picture img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+/* Sasha's portrait loads from Higgsfield (2048 x 2048) and never goes in this folder, so CSS crops it to the same
+   framing as the other mugshots, using the handoff's landmarks: eyes at y 739, chin at 1186, face centre at x 1044.
+   Tab: crop 1684 x 1296 centred on (1044, 959). Portrait: square crop 1625 centred on (1044, 1020).
+   --k is screen px per picture px; boxes taller or wider than the crop fill the way object-fit: cover does.
+   The fixed width and height keep the box sized before the picture arrives, so lazy loading starts. */
+.photo-frame { position: relative; overflow: hidden; container-type: size; }
+.photo-frame > img, .cast-tabs button .photo-frame > img, .cast-picture.photo-frame > img {
+  position: absolute; inset: auto; max-width: none; max-height: none; aspect-ratio: auto; object-fit: fill;
+  width: calc(2048 * var(--k)); height: calc(2048 * var(--k)); left: calc(50cqw - 1044 * var(--k));
 }
-.cast-tabs button .face-strip { display: block; padding: 0; aspect-ratio: 1.55; }
+.cast-tabs button .photo-frame { display: block; padding: 0; aspect-ratio: 1.3; }
+.cast-tabs button .photo-frame > img { --k: calc(max(100cqw / 1684.3, 100cqh / 1295.7)); top: calc(50cqh - 959.3 * var(--k)); }
+.cast-picture.photo-frame > img { --k: calc(max(100cqw, 100cqh) / 1625.5); top: calc(50cqh - 1020.2 * var(--k)); }
 .cast-copy { padding: clamp(20px, 3.4vw, 48px); }
 .cast-copy h3 { margin: 4px 0 5px; }
 .cast-copy .cast-reading { font: 13px/1.5 var(--mono); color: var(--ink); margin-bottom: 14px; }
@@ -233,8 +238,6 @@
   .map-marker { width: 34px; }
   .map-return { display: inline-flex; margin-top: 14px; }
   .cast-tabs { grid-auto-columns: 104px; }
-  .cast-picture img { aspect-ratio: 1.33; max-height: 420px; height: auto; }
-  .cast-picture.face-strip { aspect-ratio: 1.33; height: auto; min-height: 0; max-height: 420px; }
   .story-tabs {
     display: flex; overflow-x: auto; scrollbar-color: #535744 transparent;
   }
